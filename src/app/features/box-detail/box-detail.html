@@ -16,6 +16,9 @@
     <div class="mt-base flex flex-col items-center gap-1">
       <p class="text-body-md text-body-md text-on-surface-variant">Código Identificador de Caja</p>
       <p class="text-headline-md text-headline-md text-primary">{{ box()?.identifier }}</p>
+      @if (box()?.description; as desc) {
+        <p class="text-body-md text-body-md text-on-surface-variant text-center mt-1">{{ desc }}</p>
+      }
       <div class="flex gap-4 mt-2">
         <button class="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-variant transition-colors active:scale-95" (click)="share()">
           <span class="material-symbols-outlined text-[20px]">share</span>

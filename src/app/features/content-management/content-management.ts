@@ -25,6 +25,7 @@ export class ContentManagement implements OnInit {
 
   boxId = input.required<string>();
   boxName = signal('');
+  description = signal('');
   identifier = signal('');
   imagePreview = signal<string | null>(null);
   imageBase64 = signal<string | null>(null);
@@ -44,6 +45,7 @@ export class ContentManagement implements OnInit {
     this.boxesService.getById(this.boxId()).subscribe({
       next: data => {
         this.boxName.set(data.name ?? '');
+        this.description.set(data.description ?? '');
         this.identifier.set(data.identifier ?? '');
         this.imagePreview.set(data.imageBase64 ?? null);
         this.imageBase64.set(data.imageBase64 ?? null);
@@ -66,6 +68,10 @@ export class ContentManagement implements OnInit {
 
   updateBoxName(value: string): void {
     this.boxName.set(value);
+  }
+
+  updateDescription(value: string): void {
+    this.description.set(value);
   }
 
   updateIdentifier(value: string): void {
@@ -146,6 +152,7 @@ export class ContentManagement implements OnInit {
 
     this.boxesService.update(boxId, {
       name: this.boxName(),
+      description: this.description().trim() || undefined,
       identifier: this.identifier(),
       imageBase64: this.imageBase64() ?? undefined,
       items,

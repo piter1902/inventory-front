@@ -25,6 +25,7 @@ export class CreateBox {
   }
 
   name = signal('');
+  description = signal('');
   items = signal<PendingItem[]>([]);
   imageBase64 = signal<string | null>(null);
   saving = signal(false);
@@ -37,6 +38,10 @@ export class CreateBox {
   updateName(value: string): void {
     this.name.set(value);
     if (value.trim()) this.nameError.set(false);
+  }
+
+  updateDescription(value: string): void {
+    this.description.set(value);
   }
 
   addItem(): void {
@@ -86,6 +91,7 @@ export class CreateBox {
 
     const command: CreateBoxCommand = {
       name: trimmedName,
+      description: this.description().trim() || undefined,
       imageBase64: this.imageBase64() ?? undefined,
       items: nonEmpty.length > 0
         ? nonEmpty.map(i => ({ name: i.name.trim(), description: i.description.trim() }))

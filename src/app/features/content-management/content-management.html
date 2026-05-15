@@ -38,6 +38,13 @@
           (input)="updateBoxName($any($event.target).value)"/>
       </div>
       <div class="flex flex-col gap-base">
+        <label class="text-label-md text-label-md text-on-surface-variant px-1">Descripción</label>
+        <textarea
+          class="w-full h-24 bg-surface-container border-none rounded-lg px-4 py-3 text-body-md text-body-md focus:ring-2 focus:ring-primary text-primary outline-none resize-none"
+          [value]="description()"
+          (input)="updateDescription($any($event.target).value)"></textarea>
+      </div>
+      <div class="flex flex-col gap-base">
         <label class="text-label-md text-label-md text-on-surface-variant px-1">Identificador</label>
         <div class="relative">
           <input

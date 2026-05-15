@@ -2,6 +2,7 @@ export interface BoxDto {
   id: string;
   identifier: string;
   name: string;
+  description?: string;
   qrUrl: string;
   imageBase64?: string;
   items: ItemDto[];
@@ -16,6 +17,7 @@ export interface ItemDto {
 export interface CreateBoxCommand {
   identifier?: string;
   name: string;
+  description?: string;
   imageBase64?: string;
   items?: AddItemRequest[];
 }
@@ -23,6 +25,7 @@ export interface CreateBoxCommand {
 export interface UpdateBoxRequest {
   identifier?: string;
   name: string;
+  description?: string;
   imageBase64?: string;
   items?: UpdateItemRequest[];
 }
@@ -45,6 +48,7 @@ export interface SearchResultDto {
 export interface SearchBoxResultDto {
   id?: string;
   name?: string;
+  description?: string;
   imageBase64?: string;
 }
 
