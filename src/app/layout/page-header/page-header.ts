@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { UserAvatar } from '../../shared/user-avatar/user-avatar';
 import { PageHeaderService } from './page-header.service';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-page-header',
@@ -19,15 +20,24 @@ import { PageHeaderService } from './page-header.service';
         </button>
       }
       <app-user-avatar />
-      <h1 class="text-headline-lg-mobile md:text-headline-md text-primary font-headline-md">
+      <h1 class="text-headline-lg-mobile md:text-headline-md text-primary font-headline-md flex-1">
         {{ title() }}
       </h1>
+      <button
+        class="active:scale-95 transition-transform hover:bg-surface-container-high p-2 rounded-full"
+        (click)="themeService.toggle()"
+      >
+        <span class="material-symbols-outlined text-primary">{{
+          themeService.isDark() ? 'light_mode' : 'dark_mode'
+        }}</span>
+      </button>
     </header>
   `,
   styles: '',
 })
 export class PageHeader {
   private readonly headerService = inject(PageHeaderService);
+  protected readonly themeService = inject(ThemeService);
 
   protected readonly title = this.headerService.title;
   protected readonly showBack = this.headerService.showBack;
