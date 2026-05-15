@@ -1,0 +1,43 @@
+<main class="px-container-padding-mobile md:px-container-padding-desktop pt-stack-md max-w-2xl mx-auto pb-44 flex flex-col gap-stack-lg">
+  <section class="flex flex-col gap-stack-md">
+    <div class="flex flex-col gap-base">
+      <label class="text-label-md text-label-md text-on-surface-variant px-1" for="zone-name">Nombre de la zona *</label>
+      <input
+        class="w-full bg-surface-container border-none rounded-lg h-14 px-4 text-body-md text-body-md focus:ring-2 focus:ring-primary text-primary outline-none"
+        [class.border]="nameError()"
+        [class.border-error]="nameError()"
+        id="zone-name"
+        type="text"
+        placeholder="Ej: Almacén principal"
+        [value]="name()"
+        (input)="updateName($any($event.target).value)"/>
+      @if (nameError()) {
+        <p class="text-label-sm text-label-sm text-error px-1">El nombre de la zona es obligatorio</p>
+      }
+    </div>
+  </section>
+
+  <section class="pt-4 flex flex-col gap-stack-md">
+    @if (isEditing()) {
+      <button type="button" class="w-full flex items-center justify-between p-4 bg-error-container/10 border border-error/20 rounded-xl text-error hover:bg-error-container/20 transition-colors" (click)="delete()">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined">delete_forever</span>
+          <span class="text-label-md text-label-md">Eliminar esta zona</span>
+        </div>
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    }
+    <button
+      class="bg-secondary text-on-secondary px-5 py-3 rounded-full text-label-md text-label-md shadow-sm flex items-center justify-center gap-2 active:scale-95 transition-all hover:brightness-110"
+      [class.opacity-60]="saving()"
+      [disabled]="saving()"
+      (click)="save()">
+      @if (saving()) {
+        Guardando...
+      } @else {
+        <span class="material-symbols-outlined text-[20px]">save</span>
+        @if (isEditing()) { Guardar Cambios } @else { Crear Zona }
+      }
+    </button>
+  </section>
+</main>

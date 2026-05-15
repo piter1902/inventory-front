@@ -1,0 +1,18 @@
+<main class="px-container-padding-mobile md:px-container-padding-desktop py-stack-md flex flex-col gap-stack-lg max-w-2xl mx-auto">
+  @if (zone(); as z) {
+    <section class="bg-surface-container-lowest rounded-[1.5rem] p-stack-lg shadow-sm border border-outline-variant/30 flex flex-col items-center gap-base">
+      <div class="w-20 h-20 rounded-2xl bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+        <span class="material-symbols-outlined text-4xl">shelves</span>
+      </div>
+      <div class="flex flex-col items-center gap-1">
+        <h2 class="text-headline-lg-mobile md:text-headline-lg text-primary text-center">{{ z.name }}</h2>
+      </div>
+      <button
+        class="bg-secondary text-on-secondary px-6 py-2 rounded-full text-label-md text-label-md shadow-sm flex items-center gap-2 active:scale-95 transition-all hover:brightness-110 mt-2"
+        (click)="edit()">
+        <span class="material-symbols-outlined text-[20px]">edit</span>
+        Editar Zona
+      </button>
+    </section>
+  }
+</main>

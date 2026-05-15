@@ -38,6 +38,23 @@ export const routes: Routes = [
         path: 'boxes/:boxId/edit',
         loadComponent: () => import('./features/content-management/content-management').then(m => m.ContentManagement),
       },
+      {
+        path: 'zones',
+        data: { showBack: false },
+        loadComponent: () => import('./features/zones/zones-list').then(m => m.ZonesList),
+      },
+      {
+        path: 'zones/new',
+        loadComponent: () => import('./features/zones/zone-edit').then(m => m.ZoneEdit),
+      },
+      {
+        path: 'zones/:zoneId',
+        loadComponent: () => import('./features/zones/zone-detail').then(m => m.ZoneDetail),
+      },
+      {
+        path: 'zones/:zoneId/edit',
+        loadComponent: () => import('./features/zones/zone-edit').then(m => m.ZoneEdit),
+      },
     ],
   },
 ];

@@ -1,0 +1,49 @@
+<main class="px-container-padding-mobile md:px-container-padding-desktop pt-stack-md max-w-7xl mx-auto">
+  <div class="mb-stack-lg sticky top-16 bg-surface-bright/80 backdrop-blur-md py-4 z-30">
+    <div class="relative group">
+      <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+        <span class="material-symbols-outlined text-outline leading-none">search</span>
+      </div>
+      <input
+        class="w-full h-14 pl-12 pr-4 bg-surface-container rounded-xl focus:ring-2 focus:outline-none focus:bg-surface-container-lowest transition-all text-body-md placeholder:text-outline shadow-sm"
+        placeholder="Buscar zonas..."
+        type="text"
+        (input)="onSearch($event)"/>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-gutter mb-stack-lg">
+    <div class="bg-surface-container-low p-4 rounded-2xl border border-outline-variant/30">
+      <p class="text-label-sm text-on-surface-variant mb-1">Total Zonas</p>
+      <p class="text-headline-md text-headline-md text-primary">{{ totalZones }}</p>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-base">
+    @for (zone of filteredZones; track zone.id) {
+      <div
+        class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-outline-variant/20 flex items-center gap-4 active:scale-[0.98] cursor-pointer transition-all hover:shadow-md"
+        (click)="openZone(zone.id)">
+        <div class="w-14 h-14 rounded-xl bg-surface-container-high flex items-center justify-center shrink-0 text-on-surface-variant">
+          <span class="material-symbols-outlined text-2xl">shelves</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <h3 class="text-headline-md text-headline-md text-primary truncate">{{ zone.name }}</h3>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+        </div>
+      </div>
+    } @empty {
+      <div class="py-16 text-center">
+        <span class="material-symbols-outlined text-5xl text-on-surface-variant block mb-3">shelves</span>
+        <p class="text-body-md text-body-md text-on-surface-variant mb-2">No hay zonas registradas</p>
+        <p class="text-label-sm text-label-sm text-on-surface-variant">Crea tu primera zona para organizar tus cajas</p>
+      </div>
+    }
+  </div>
+</main>
+
+<button class="fixed right-6 bottom-24 w-16 h-16 bg-secondary text-on-secondary rounded-2xl shadow-lg flex items-center justify-center active:scale-90 transition-all z-50 group" (click)="onCreateZone()">
+  <span class="material-symbols-outlined text-[32px] group-hover:rotate-90 transition-transform duration-300">add</span>
+</button>
