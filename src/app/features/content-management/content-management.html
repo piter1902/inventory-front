@@ -1,21 +1,4 @@
-<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-container-padding-mobile h-16 bg-surface shadow-sm">
-  <div class="flex items-center gap-4">
-    <button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-container-high transition-colors active:scale-90" [routerLink]="['/boxes', boxId()]">
-      <span class="material-symbols-outlined text-primary">arrow_back</span>
-    </button>
-    <h1 class="text-headline-md text-headline-md text-primary">Editar Caja</h1>
-  </div>
-  <div class="flex items-center">
-    <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed-dim flex-shrink-0">
-      <img
-        alt="User profile photo"
-        class="w-full h-full object-cover"
-        src="https://lh3.googleusercontent.com/aida-public/AB6AXuArVHPTeMd_16Ku8Lu6IyKFZtD0TsBV4sDLGlsdtfP3LZPt3wHty6HWmKclJtjOWeV5pQ3pnYqcUKKQ_ZrSbjQilQpvYMbzflCNMvOik-9B8_WWgXtcsXzTdzO-SuY-5l6mYqbpCKemyDMMXA0Bsb9iijn21tZC58H74HXkTv_ew-JEqvHEw7TfuQsDDpkTjvIaAjYSUgJ7odg6dUL31XE5e1_8_AGlWxO0XnqW9CQofUJjrwnIPEHSLtzwePgyALLrycd1j5QJ0A"/>
-    </div>
-  </div>
-</header>
-
-<main class="pt-20 px-container-padding-mobile max-w-2xl mx-auto pb-44 flex flex-col gap-stack-lg">
+<main class="px-container-padding-mobile max-w-2xl mx-auto pb-44 flex flex-col gap-stack-lg">
   @if (loading()) {
     <div class="flex justify-center py-12">
       <span class="material-symbols-outlined text-4xl text-on-surface-variant animate-spin">progress_activity</span>
@@ -122,7 +105,7 @@
     </section>
 
     <!-- Danger Zone -->
-    <section class="pt-4">
+    <section class="pt-4 flex flex-col gap-stack-md">
       <button type="button" class="w-full flex items-center justify-between p-4 bg-error-container/10 border border-error/20 rounded-xl text-error hover:bg-error-container/20 transition-colors" (click)="deleteBox()">
         <div class="flex items-center gap-3">
           <span class="material-symbols-outlined">delete_forever</span>
@@ -130,21 +113,18 @@
         </div>
         <span class="material-symbols-outlined">chevron_right</span>
       </button>
+      <button
+        class="bg-secondary text-on-secondary px-5 py-2 rounded-full text-label-md text-label-md shadow-sm flex items-center justify-center gap-2 active:scale-95 transition-all hover:brightness-110"
+        [class.opacity-60]="saving()"
+        [disabled]="saving()"
+        (click)="save()">
+        @if (saving()) {
+          Guardando...
+        } @else {
+          <span class="material-symbols-outlined text-[20px]">save</span>
+          Guardar Cambios
+        }
+      </button>
     </section>
   }
 </main>
-
-<!-- Bottom Action Bar -->
-<div class="fixed bottom-20 left-0 w-full px-container-padding-mobile py-4 bg-surface/80 backdrop-blur-md z-40">
-  <button
-    class="w-full bg-secondary text-on-secondary h-14 rounded-xl text-headline-md text-headline-md font-bold shadow-lg active:scale-95 transition-all"
-    [class.opacity-60]="saving()"
-    [disabled]="saving()"
-    (click)="save()">
-    @if (saving()) {
-      Guardando...
-    } @else {
-      Guardar Cambios
-    }
-  </button>
-</div>

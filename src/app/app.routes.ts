@@ -1,10 +1,20 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'boxes', pathMatch: 'full' },
   {
+    path: 'auth/callback',
+    loadComponent: () => import('./auth/auth-callback/auth-callback.component').then(m => m.AuthCallbackComponent),
+  },
+  {
+    path: 'unauthorized',
+    loadComponent: () => import('./features/unauthorized/unauthorized').then(m => m.Unauthorized),
+  },
+  {
     path: '',
     loadComponent: () => import('./layout/main-layout/main-layout').then(m => m.MainLayout),
+    canActivate: [authGuard],
     children: [
       {
         path: 'boxes/new',
@@ -12,6 +22,7 @@ export const routes: Routes = [
       },
       {
         path: 'boxes',
+        data: { showBack: false },
         loadComponent: () => import('./features/boxes-dashboard/boxes-dashboard').then(m => m.BoxesDashboard),
       },
       {
@@ -20,6 +31,7 @@ export const routes: Routes = [
       },
       {
         path: 'search',
+        data: { showBack: false },
         loadComponent: () => import('./features/inventory-search/inventory-search').then(m => m.InventorySearch),
       },
       {

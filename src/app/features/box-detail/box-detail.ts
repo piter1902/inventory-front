@@ -3,6 +3,7 @@ import { RouterLink, Router } from '@angular/router';
 import QRCode from 'qrcode';
 import { BoxesService } from '../../services/boxes.service';
 import { BoxDto } from '../../models/box.models';
+import { PageHeaderService } from '../../layout/page-header/page-header.service';
 
 @Component({
   selector: 'app-box-detail',
@@ -13,6 +14,7 @@ import { BoxDto } from '../../models/box.models';
 export class BoxDetail implements OnInit {
   private boxesService = inject(BoxesService);
   private router = inject(Router);
+  private readonly headerService = inject(PageHeaderService);
 
   boxId = input.required<string>();
   box = signal<BoxDto | null>(null);
@@ -25,6 +27,7 @@ export class BoxDetail implements OnInit {
   ngOnInit(): void {
     this.boxesService.getById(this.boxId()).subscribe(data => {
       this.box.set(data);
+      this.headerService.setTitle(data.name || 'Home Inventory');
       this.generateQr();
     });
   }

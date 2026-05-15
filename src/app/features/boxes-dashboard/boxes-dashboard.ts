@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { BoxesService } from '../../services/boxes.service';
 import { BoxDto } from '../../models/box.models';
+import { PageHeaderService } from '../../layout/page-header/page-header.service';
 
 @Component({
   selector: 'app-boxes-dashboard',
@@ -12,6 +13,10 @@ import { BoxDto } from '../../models/box.models';
 export class BoxesDashboard implements OnInit {
   private boxesService = inject(BoxesService);
   private router = inject(Router);
+
+  constructor() {
+    inject(PageHeaderService).setTitle('Home Inventory');
+  }
 
   boxes = signal<BoxDto[]>([]);
   searchQuery = signal('');

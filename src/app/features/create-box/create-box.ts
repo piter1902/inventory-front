@@ -1,7 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { BoxesService } from '../../services/boxes.service';
 import { CreateBoxCommand } from '../../models/box.models';
+import { PageHeaderService } from '../../layout/page-header/page-header.service';
 
 interface PendingItem {
   id: string;
@@ -11,13 +12,17 @@ interface PendingItem {
 
 @Component({
   selector: 'app-create-box',
-  imports: [RouterLink],
+  imports: [],
   templateUrl: './create-box.html',
   styleUrl: './create-box.scss',
 })
 export class CreateBox {
   private boxesService = inject(BoxesService);
   private router = inject(Router);
+
+  constructor() {
+    inject(PageHeaderService).setTitle('Nueva Caja');
+  }
 
   name = signal('');
   items = signal<PendingItem[]>([]);

@@ -1,7 +1,8 @@
 import { Component, inject, input, OnInit, signal, viewChild, ElementRef } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { BoxesService } from '../../services/boxes.service';
 import { UpdateItemRequest } from '../../models/box.models';
+import { PageHeaderService } from '../../layout/page-header/page-header.service';
 
 interface EditableItem {
   id: string;
@@ -13,13 +14,14 @@ interface EditableItem {
 
 @Component({
   selector: 'app-content-management',
-  imports: [RouterLink],
+  imports: [],
   templateUrl: './content-management.html',
   styleUrl: './content-management.scss',
 })
 export class ContentManagement implements OnInit {
   private boxesService = inject(BoxesService);
   private router = inject(Router);
+  private readonly headerService = inject(PageHeaderService);
 
   boxId = input.required<string>();
   boxName = signal('');
@@ -38,6 +40,7 @@ export class ContentManagement implements OnInit {
   }
 
   ngOnInit(): void {
+    this.headerService.setTitle('Editar Caja');
     this.boxesService.getById(this.boxId()).subscribe({
       next: data => {
         this.boxName.set(data.name ?? '');

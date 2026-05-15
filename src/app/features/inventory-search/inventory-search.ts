@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { BoxesService } from '../../services/boxes.service';
 import { SearchResultDto, SearchBoxResultDto, SearchItemResultDto } from '../../models/box.models';
+import { PageHeaderService } from '../../layout/page-header/page-header.service';
 
 @Component({
   selector: 'app-inventory-search',
@@ -24,6 +25,8 @@ export class InventorySearch implements OnInit {
   filters = ['Todo', 'Cajas', 'Items'];
 
   constructor() {
+    inject(PageHeaderService).setTitle('Home Inventory');
+
     this.searchSubject.pipe(
       debounceTime(300),
       distinctUntilChanged(),
