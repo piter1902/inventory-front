@@ -1,0 +1,150 @@
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-container-padding-mobile h-16 bg-surface shadow-sm">
+  <div class="flex items-center gap-4">
+    <button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-container-high transition-colors active:scale-90" [routerLink]="['/boxes', boxId()]">
+      <span class="material-symbols-outlined text-primary">arrow_back</span>
+    </button>
+    <h1 class="text-headline-md text-headline-md text-primary">Editar Caja</h1>
+  </div>
+  <div class="flex items-center">
+    <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed-dim flex-shrink-0">
+      <img
+        alt="User profile photo"
+        class="w-full h-full object-cover"
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuArVHPTeMd_16Ku8Lu6IyKFZtD0TsBV4sDLGlsdtfP3LZPt3wHty6HWmKclJtjOWeV5pQ3pnYqcUKKQ_ZrSbjQilQpvYMbzflCNMvOik-9B8_WWgXtcsXzTdzO-SuY-5l6mYqbpCKemyDMMXA0Bsb9iijn21tZC58H74HXkTv_ew-JEqvHEw7TfuQsDDpkTjvIaAjYSUgJ7odg6dUL31XE5e1_8_AGlWxO0XnqW9CQofUJjrwnIPEHSLtzwePgyALLrycd1j5QJ0A"/>
+    </div>
+  </div>
+</header>
+
+<main class="pt-20 px-container-padding-mobile max-w-2xl mx-auto pb-44 flex flex-col gap-stack-lg">
+  @if (loading()) {
+    <div class="flex justify-center py-12">
+      <span class="material-symbols-outlined text-4xl text-on-surface-variant animate-spin">progress_activity</span>
+    </div>
+  } @else {
+    <!-- Photo Section -->
+    <section class="relative group">
+      <div class="w-full h-48 rounded-xl overflow-hidden bg-surface-container-high shadow-sm relative">
+        @if (imagePreview()) {
+          <img alt="Foto de la caja" class="w-full h-full object-cover" [src]="imagePreview()"/>
+        } @else {
+          <div class="w-full h-full flex items-center justify-center text-on-surface-variant">
+            <span class="material-symbols-outlined text-6xl">image</span>
+          </div>
+        }
+        <div class="absolute inset-0 bg-primary/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" (click)="fileInput.click()">
+          <button type="button" class="bg-surface-container-lowest text-primary px-4 py-2 rounded-full text-label-md text-label-md flex items-center gap-2 shadow-lg">
+            <span class="material-symbols-outlined text-[20px]">photo_camera</span>
+            Cambiar Foto
+          </button>
+        </div>
+      </div>
+      <input #fileInput type="file" accept="image/*" class="hidden" (change)="onPhotoSelected($event)"/>
+      <button type="button" class="absolute bottom-4 right-4 w-12 h-12 bg-secondary text-on-secondary rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform" (click)="fileInput.click()">
+        <span class="material-symbols-outlined">edit</span>
+      </button>
+    </section>
+
+    <!-- Form Fields -->
+    <section class="flex flex-col gap-stack-md">
+      <div class="flex flex-col gap-base">
+        <label class="text-label-md text-label-md text-on-surface-variant px-1">Nombre de la caja</label>
+        <input
+          class="w-full bg-surface-container border-none rounded-lg h-14 px-4 text-body-md text-body-md focus:ring-2 focus:ring-primary text-primary outline-none"
+          type="text"
+          [value]="boxName()"
+          (input)="updateBoxName($any($event.target).value)"/>
+      </div>
+      <div class="flex flex-col gap-base">
+        <label class="text-label-md text-label-md text-on-surface-variant px-1">Identificador</label>
+        <div class="relative">
+          <input
+            class="w-full bg-surface-container border-none rounded-lg h-14 px-4 text-body-md text-body-md focus:ring-2 focus:ring-primary text-primary outline-none"
+            type="text"
+            [value]="identifier()"
+            (input)="updateIdentifier($any($event.target).value)"/>
+          <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline">qr_code_2</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Items Section -->
+    <section class="flex flex-col gap-stack-md">
+      <div class="flex items-center justify-between">
+        <h2 class="text-headline-md text-headline-md text-primary">Contenido de la caja</h2>
+        <span class="text-label-sm text-label-sm bg-primary-container text-on-primary-container px-3 py-1 rounded-full">{{ itemsCount }} Items</span>
+      </div>
+      <div class="flex flex-col gap-base">
+        @for (item of editItems(); track item.id) {
+          @if (!item._isDeleted) {
+            <div class="flex items-center gap-4 p-4 bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30">
+              <div class="w-12 h-12 rounded-lg bg-surface-container-high flex-shrink-0 overflow-hidden flex items-center justify-center text-on-surface-variant">
+                <span class="material-symbols-outlined">inventory_2</span>
+              </div>
+              @if (editingItemId() === item.id) {
+                <div class="flex-grow flex flex-col gap-1">
+                  <input
+                    class="bg-surface-container rounded-lg px-3 py-2 text-label-md text-label-md text-primary outline-none focus:ring-2 focus:ring-primary"
+                    type="text"
+                    [value]="item.name"
+                    (input)="updateItemName(item.id, $any($event.target).value)"/>
+                  <input
+                    class="bg-surface-container rounded-lg px-3 py-2 text-label-sm text-label-sm text-on-surface-variant outline-none focus:ring-2 focus:ring-primary"
+                    type="text"
+                    [value]="item.description"
+                    (input)="updateItemDescription(item.id, $any($event.target).value)"/>
+                </div>
+              } @else {
+                <div class="flex-grow">
+                  <h3 class="text-label-md text-label-md text-primary">{{ item.name }}</h3>
+                  @if (item.description) {
+                    <p class="text-label-sm text-label-sm text-on-surface-variant">{{ item.description }}</p>
+                  }
+                </div>
+              }
+              <div class="flex gap-2">
+                <button type="button" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-high text-primary active:scale-90" (click)="toggleEditItem(item.id)">
+                  <span class="material-symbols-outlined text-[20px]">edit</span>
+                </button>
+                <button type="button" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error active:scale-90" (click)="removeItem(item.id)">
+                  <span class="material-symbols-outlined text-[20px]">delete</span>
+                </button>
+              </div>
+            </div>
+          }
+        }
+
+        <!-- Add New Item Button -->
+        <button type="button" class="w-full py-4 border-2 border-dashed border-outline-variant rounded-xl flex items-center justify-center gap-2 text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-[0.98]" (click)="addItem()">
+          <span class="material-symbols-outlined">add_circle</span>
+          <span class="text-label-md text-label-md">Añadir nuevo item</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Danger Zone -->
+    <section class="pt-4">
+      <button type="button" class="w-full flex items-center justify-between p-4 bg-error-container/10 border border-error/20 rounded-xl text-error hover:bg-error-container/20 transition-colors" (click)="deleteBox()">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined">delete_forever</span>
+          <span class="text-label-md text-label-md">Eliminar esta caja</span>
+        </div>
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    </section>
+  }
+</main>
+
+<!-- Bottom Action Bar -->
+<div class="fixed bottom-20 left-0 w-full px-container-padding-mobile py-4 bg-surface/80 backdrop-blur-md z-40">
+  <button
+    class="w-full bg-secondary text-on-secondary h-14 rounded-xl text-headline-md text-headline-md font-bold shadow-lg active:scale-95 transition-all"
+    [class.opacity-60]="saving()"
+    [disabled]="saving()"
+    (click)="save()">
+    @if (saving()) {
+      Guardando...
+    } @else {
+      Guardar Cambios
+    }
+  </button>
+</div>

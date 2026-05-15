@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface": "#f7f9fb",
+                      "surface-container-low": "#f2f4f6",
+                      "primary-fixed": "#d7e2ff",
+                      "surface-tint": "#4f5e7e",
+                      "secondary": "#006e2f",
+                      "on-secondary-fixed-variant": "#005321",
+                      "on-primary-container": "#8393b5",
+                      "surface-container-high": "#e6e8ea",
+                      "secondary-fixed": "#6bff8f",
+                      "secondary-container": "#6bff8f",
+                      "background": "#f7f9fb",
+                      "surface-bright": "#f7f9fb",
+                      "on-surface": "#191c1e",
+                      "on-secondary-container": "#007432",
+                      "inverse-on-surface": "#eff1f3",
+                      "on-tertiary-fixed-variant": "#38485d",
+                      "secondary-fixed-dim": "#4ae176",
+                      "primary-container": "#1b2b48",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary-fixed-dim": "#b7c8e1",
+                      "error": "#ba1a1a",
+                      "on-error": "#ffffff",
+                      "surface-container": "#eceef0",
+                      "on-primary-fixed-variant": "#374765",
+                      "inverse-primary": "#b7c7eb",
+                      "outline-variant": "#c5c6ce",
+                      "on-error-container": "#93000a",
+                      "inverse-surface": "#2d3133",
+                      "surface-dim": "#d8dadc",
+                      "outline": "#75777e",
+                      "error-container": "#ffdad6",
+                      "on-secondary-fixed": "#002109",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary-container": "#8393ac",
+                      "surface-variant": "#e0e3e5",
+                      "on-background": "#191c1e",
+                      "tertiary-container": "#1c2c40",
+                      "tertiary-fixed": "#d3e4fe",
+                      "primary": "#041632",
+                      "on-tertiary": "#ffffff",
+                      "primary-fixed-dim": "#b7c7eb",
+                      "on-primary-fixed": "#091b37",
+                      "on-primary": "#ffffff",
+                      "surface-container-highest": "#e0e3e5",
+                      "on-surface-variant": "#44474d",
+                      "tertiary": "#06172a",
+                      "on-tertiary-fixed": "#0b1c30"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "container-padding-mobile": "16px",
+                      "stack-lg": "24px",
+                      "stack-sm": "8px",
+                      "stack-md": "16px",
+                      "base": "8px",
+                      "container-padding-desktop": "32px"
+              },
+              "fontFamily": {
+                      "label-sm": ["Inter"],
+                      "label-md": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-lg-mobile": ["Inter"]
+              },
+              "fontSize": {
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-container-padding-mobile h-16 bg-surface dark:bg-surface-dim shadow-sm">
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-container-high transition-colors duration-200 active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined text-primary" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Editar Caja</h1>
+</div>
+<div class="flex items-center">
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-container-high transition-colors duration-200">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</header>
+<main class="pt-20 px-container-padding-mobile max-w-2xl mx-auto space-y-stack-lg">
+<!-- Photo Section -->
+<section class="relative group">
+<div class="w-full h-48 rounded-xl overflow-hidden bg-surface-container-high shadow-sm relative">
+<img alt="Foto de la caja" class="w-full h-full object-cover" data-alt="A high-quality, professional photograph of an organized wooden storage box filled with clean gardening tools like a trowel and shears. The setting is a brightly lit, modern greenhouse with soft morning sunlight filtering through. The visual style is minimalist and clean, using a palette of natural wood tones, soft greens, and deep navy accents to match a professional inventory management application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5FNwTj5XRHiudMfk-tEQtUtRSMMiujkNX0DtlgIsX-_o10gw2nP0NQ49IMNb_RGSoOjMxPxSlg0Hvenhh6qzQeWqcnK0wlXY2OmKPriMQ5gvopTu_aBWfPagyXt6T-kWXmeU4jbtBFhRXU7RCrEz9xzKeJEWqr1Zu-Up4FgZxnBYNUud_aKYpET26Cm1v-UKBk5IAfQ9p209F4Kx8KyDy_JPpYY91ieLjkNXtZvlZTlHwIBLuGGrKBJmDNXx2wtYWa2K3mMvuIQ"/>
+<div class="absolute inset-0 bg-primary/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+<button class="bg-surface-container-lowest text-primary px-4 py-2 rounded-full font-label-md text-label-md flex items-center gap-2 shadow-lg">
+<span class="material-symbols-outlined text-[20px]" data-icon="photo_camera">photo_camera</span>
+                        Cambiar Foto
+                    </button>
+</div>
+</div>
+<button class="absolute bottom-4 right-4 w-12 h-12 bg-secondary text-on-secondary rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+</section>
+<!-- Form Fields -->
+<section class="space-y-stack-md">
+<div class="space-y-base">
+<label class="font-label-md text-label-md text-on-surface-variant px-1">Nombre de la caja</label>
+<input class="w-full bg-[#F1F5F9] border-none rounded-lg h-14 px-4 font-body-md text-body-md focus:ring-2 focus:ring-primary text-primary" type="text" value="Herramientas de Jardín"/>
+</div>
+<div class="space-y-base">
+<label class="font-label-md text-label-md text-on-surface-variant px-1">Identificador</label>
+<div class="relative">
+<input class="w-full bg-[#F1F5F9] border-none rounded-lg h-14 px-4 font-body-md text-body-md focus:ring-2 focus:ring-primary text-primary" type="text" value="BOX-001"/>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline" data-icon="qr_code_2">qr_code_2</span>
+</div>
+</div>
+</section>
+<!-- Items Section -->
+<section class="space-y-stack-md">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md text-primary">Contenido de la caja</h2>
+<span class="font-label-sm text-label-sm bg-primary-container text-on-primary-container px-3 py-1 rounded-full">2 Items</span>
+</div>
+<div class="space-y-base">
+<!-- Item 1 -->
+<div class="flex items-center gap-4 p-4 bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30">
+<div class="w-12 h-12 rounded-lg bg-surface-container-high flex-shrink-0 overflow-hidden">
+<img alt="Pala de mano" class="w-full h-full object-cover" data-alt="Close up of a small, well-maintained metal hand trowel for gardening with a wooden handle. The lighting is crisp and clear, highlighting the metallic texture against a clean, neutral background. The style is modern and functional, fitting into a clean tool inventory interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRJROG5V5yNpM69itn8EZpp-xqrGd4nYzD-hkg2AJoEJGB1mjayTB41scg6bsOHy5G018uD7rYXTm8Tanie5VJgR7KJCA8gCd8eDukZ4YNjSFZPkUHox1uWO8N_-bqVyUpoFgdas-pZgWJlwgItJXaTnWrsUiWZXUmfX_m2BhLWgz1ngQJpEIis47H4RxOc9QvbyjajtjC3a1uAQhj6glLcV5iEIyt_Hvs4NSJ1jOWW91c9DMnE73BvjMygJVxTWKlTzTwsJq8BA"/>
+</div>
+<div class="flex-grow">
+<h3 class="font-label-md text-label-md text-primary">Pala de mano</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Acero inoxidable</p>
+</div>
+<div class="flex gap-2">
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-high text-primary">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center gap-4 p-4 bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30">
+<div class="w-12 h-12 rounded-lg bg-surface-container-high flex-shrink-0 overflow-hidden">
+<img alt="Tijeras de podar" class="w-full h-full object-cover" data-alt="Detailed macro shot of sharp gardening pruning shears with red ergonomic handles. The focus is sharp on the blades, reflecting soft studio lighting. The background is a minimalist, out-of-focus garage workshop, maintaining a clean and professional inventory aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQgPdMGiT5GpsoIGTDCxohql8aY-b4MVtsg9du1M1paZNGOv03H2Zl9VuPSuzNy2nLP0ZdpNlHzZw-KH7JGpzxhH66ufaRJie9DG053etFxxn7q-yDY-pmP616n1GDx27WzI7PMv9QbNS9eIo_dYvKa0A0mtxtxRuNr_r6LNHTKNyEM-yEHMA_U0dn4PZewitKNfAowq0PZcOg9IMim8zLkL7wMh4POFf6zOaX6Pl6N4mYbwIY_F4e8Y1ebpA97E-edX749NKrvA"/>
+</div>
+<div class="flex-grow">
+<h3 class="font-label-md text-label-md text-primary">Tijeras de podar</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Corte de 20mm</p>
+</div>
+<div class="flex gap-2">
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-high text-primary">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<!-- Add New Item Button -->
+<button class="w-full py-4 border-2 border-dashed border-outline-variant rounded-xl flex items-center justify-center gap-2 text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-[0.98]">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="font-label-md text-label-md">Añadir nuevo item</span>
+</button>
+</div>
+</section>
+<!-- Danger Zone -->
+<section class="pt-4">
+<button class="w-full flex items-center justify-between p-4 bg-error-container/10 border border-error/20 rounded-xl text-error hover:bg-error-container/20 transition-colors">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="delete_forever">delete_forever</span>
+<span class="font-label-md text-label-md">Eliminar esta caja</span>
+</div>
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</section>
+</main>
+<!-- Bottom Action Area -->
+<div class="fixed bottom-20 left-0 w-full px-container-padding-mobile py-4 bg-surface/80 backdrop-blur-md z-40">
+<button class="w-full bg-secondary text-on-secondary h-14 rounded-xl font-headline-md text-headline-md font-bold shadow-lg active:scale-95 transition-all">
+            Guardar Cambios
+        </button>
+</div>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center bg-surface dark:bg-inverse-surface px-base pb-safe h-20 shadow-[0_-1px_3px_0_rgba(0,0,0,0.1)] rounded-t-xl">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-high dark:hover:bg-tertiary-container transition-all active:scale-90">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm">Inicio</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-high dark:hover:bg-tertiary-container transition-all active:scale-90">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="font-label-sm text-label-sm">Búsqueda</span>
+</button>
+<!-- ACTIVE: Cajas -->
+<button class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-xl px-4 py-1 transition-all active:scale-90">
+<span class="material-symbols-outlined" data-icon="inventory_2" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-label-sm text-label-sm font-bold">Cajas</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-high dark:hover:bg-tertiary-container transition-all active:scale-90">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-sm text-label-sm">Ajustes</span>
+</button>
+</nav>
+</body></html>

@@ -1,0 +1,113 @@
+<header class="w-full top-0 sticky z-40 bg-surface shadow-sm flex items-center gap-3 px-container-padding-mobile md:px-container-padding-desktop h-16">
+  <button class="active:scale-95 transition-transform hover:bg-surface-container-high p-2 rounded-full" routerLink="/boxes" style="margin-left: -8px">
+    <span class="material-symbols-outlined text-primary">arrow_back</span>
+  </button>
+  <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed-dim active:scale-95 transition-transform cursor-pointer">
+    <img
+      alt="User profile photo"
+      class="w-full h-full object-cover"
+      src="https://lh3.googleusercontent.com/aida-public/AB6AXuArVHPTeMd_16Ku8Lu6IyKFZtD0TsBV4sDLGlsdtfP3LZPt3wHty6HWmKclJtjOWeV5pQ3pnYqcUKKQ_ZrSbjQilQpvYMbzflCNMvOik-9B8_WWgXtcsXzTdzO-SuY-5l6mYqbpCKemyDMMXA0Bsb9iijn21tZC58H74HXkTv_ew-JEqvHEw7TfuQsDDpkTjvIaAjYSUgJ7odg6dUL31XE5e1_8_AGlWxO0XnqW9CQofUJjrwnIPEHSLtzwePgyALLrycd1j5QJ0A"/>
+  </div>
+  <h1 class="text-headline-lg-mobile md:text-headline-md text-primary font-headline-md">Nueva Caja</h1>
+</header>
+
+<main class="px-container-padding-mobile md:px-container-padding-desktop pt-stack-md max-w-2xl mx-auto mb-40">
+  <section class="space-y-stack-lg">
+    <div class="space-y-stack-sm">
+      <label class="text-label-md text-label-md text-on-surface-variant block" for="box-name">Nombre de la caja *</label>
+      <input
+        class="w-full h-12 px-4 bg-surface-container rounded-lg focus:ring-2 focus:outline-none focus:bg-surface-container-lowest text-body-md text-body-md text-on-surface"
+        [class.border]="nameError()"
+        [class.border-error]="nameError()"
+        id="box-name"
+        type="text"
+        placeholder="Ej: Herramientas de Jardín"
+        (input)="updateName($any($event.target).value)"/>
+      @if (nameError()) {
+        <p class="text-label-sm text-label-sm text-error">El nombre de la caja es obligatorio</p>
+      }
+    </div>
+
+  </section>
+
+  <section class="space-y-stack-md mt-stack-lg">
+    <div class="flex items-center justify-between">
+      <h2 class="text-headline-md text-headline-md text-primary">Items iniciales</h2>
+      <span class="text-label-sm text-label-sm text-on-surface-variant bg-surface-container-high px-2 py-1 rounded-full">{{ itemCount }} items</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+      <button class="flex flex-col items-center justify-center p-gutter border-2 border-dashed border-outline-variant rounded-xl hover:bg-surface-container-low transition-colors group" (click)="addItem()">
+        <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center mb-stack-sm group-active:scale-90 transition-transform">
+          <span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'wght' 600;">add</span>
+        </div>
+        <span class="text-label-md text-label-md text-on-surface-variant">Añadir primer item</span>
+      </button>
+
+      <div class="relative overflow-hidden bg-primary-container text-on-primary-container p-gutter rounded-xl flex flex-col justify-between min-h-[140px] shadow-sm">
+        <div class="flex flex-col">
+          <span class="material-symbols-outlined text-primary-fixed-dim mb-2">barcode_scanner</span>
+          <h3 class="text-label-md text-label-md font-bold">Escaneo Rápido</h3>
+          <p class="text-label-sm text-label-sm opacity-80">Añade varios objetos usando la cámara</p>
+        </div>
+        <div class="absolute -right-4 -bottom-4 opacity-10">
+          <span class="material-symbols-outlined text-[80px]">inventory</span>
+        </div>
+      </div>
+    </div>
+
+    @for (item of items(); track item.id) {
+      <div class="flex items-center gap-4 p-4 bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30">
+        <div class="w-12 h-12 bg-surface-container rounded-lg flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-outline">inventory_2</span>
+        </div>
+        <div class="flex-1 min-w-0 flex flex-col gap-1">
+          <input
+            class="bg-transparent border-b border-outline-variant focus:border-secondary text-headline-md text-headline-md text-on-surface outline-none py-0.5"
+            type="text"
+            placeholder="Nombre del item"
+            (input)="updateItemName(item.id, $any($event.target).value)"/>
+          <input
+            class="bg-transparent border-b border-outline-variant focus:border-secondary text-body-md text-body-md text-on-surface-variant outline-none py-0.5"
+            type="text"
+            placeholder="Descripción"
+            (input)="updateItemDescription(item.id, $any($event.target).value)"/>
+        </div>
+        <button class="material-symbols-outlined text-error hover:bg-error-container/20 p-1 rounded-full transition-colors active:scale-90 shrink-0" (click)="removeItem(item.id)">delete</button>
+      </div>
+    }
+
+    <div class="bg-surface-container-high rounded-3xl p-gutter flex items-center gap-gutter mt-stack-lg relative overflow-hidden cursor-pointer" (click)="fileInput.click()">
+      <div class="w-20 h-20 bg-white rounded-2xl shadow-inner flex items-center justify-center overflow-hidden shrink-0">
+        @if (imageBase64()) {
+          <img class="w-full h-full object-cover" [src]="imageBase64()!" alt="Box preview"/>
+        } @else {
+          <img
+            class="w-full h-full object-cover"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsnZ7FZ4aiGjT4ghJ09wkXKjrauxrYms71VrzNWef8y0uCemAxPKZm4bsJm-GEUjs924LYVH0HWkHbvohinbUrpwNvp38QS47Ut-UUaAvj3myryaBeboIEINWQehXBcajSsVazc-zKnbWGLcgoGYF0KG95BvllGnrwxATBJNd9_RuKpJB8hj3aRGzdt9L0kT39XyhLgEZy7joSDS7t0eZmMrt18hZmG_WlSeq3gwnG_FqbHsCdrK4QTP-qPszGFwzfIVrSdh8wPA"
+            alt="Box preview"/>
+        }
+      </div>
+      <div class="flex-1">
+        <p class="text-label-sm text-label-sm text-on-surface-variant leading-tight">Sube una foto de la caja para identificarla visualmente en el estante.</p>
+        <span class="mt-2 inline-block text-secondary text-label-md text-label-md hover:underline">@if (imageBase64()) { Cambiar foto } @else { Subir foto }</span>
+      </div>
+      <input #fileInput type="file" accept="image/*" class="hidden" (change)="onPhotoSelected($event)"/>
+    </div>
+  </section>
+</main>
+
+<div class="fixed bottom-24 left-0 w-full px-container-padding-mobile flex justify-center z-40">
+  <button
+    class="w-full max-w-md h-14 bg-secondary text-on-secondary rounded-full text-label-md text-label-md font-bold shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-transform duration-150"
+    [class.opacity-60]="saving()"
+    [disabled]="saving()"
+    (click)="create()">
+    @if (saving()) {
+      <span>Guardando...</span>
+    } @else {
+      <span class="material-symbols-outlined">done</span>
+      <span>Crear Caja</span>
+    }
+  </button>
+</div>
