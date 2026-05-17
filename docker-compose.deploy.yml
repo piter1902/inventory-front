@@ -1,5 +1,6 @@
 services:
   frontend:
+    platform: ${DOCKER_PLATFORM:-linux/amd64}
     build:
       context: .
     ports:
@@ -10,6 +11,7 @@ services:
     restart: unless-stopped
 
   api:
+    platform: ${DOCKER_PLATFORM:-linux/amd64}
     image: ${API_IMAGE:-inventory-api:latest}
     build:
       context: ${API_CONTEXT:-../inventory-api}
