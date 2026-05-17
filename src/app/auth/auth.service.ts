@@ -16,7 +16,16 @@ export class AuthService {
   }
 
   login(): void {
+    sessionStorage.setItem('auth_redirect', window.location.pathname);
     this.oidcSecurityService.authorize();
+  }
+
+  getRedirectUrl(): string {
+    return sessionStorage.getItem('auth_redirect') || '/boxes';
+  }
+
+  clearRedirectUrl(): void {
+    sessionStorage.removeItem('auth_redirect');
   }
 
   logout(): void {

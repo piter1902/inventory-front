@@ -6,13 +6,48 @@
       </div>
       <div class="flex flex-col items-center gap-1">
         <h2 class="text-headline-lg-mobile md:text-headline-lg text-primary text-center">{{ z.name }}</h2>
+        <div class="flex items-center gap-2 mt-2 bg-surface-container-high px-4 py-2 rounded-full">
+          <span class="material-symbols-outlined text-[20px] text-on-surface-variant">inventory_2</span>
+          <span class="text-label-md text-label-md text-on-surface-variant">{{ boxes.length }} cajas en esta zona</span>
+        </div>
       </div>
-      <button
-        class="bg-secondary text-on-secondary px-6 py-2 rounded-full text-label-md text-label-md shadow-sm flex items-center gap-2 active:scale-95 transition-all hover:brightness-110 mt-2"
-        (click)="edit()">
+      <button class="bg-secondary text-on-secondary px-5 py-2 rounded-full text-label-md text-label-md shadow-sm flex items-center gap-2 active:scale-95 transition-all hover:brightness-110" (click)="edit()">
         <span class="material-symbols-outlined text-[20px]">edit</span>
         Editar Zona
       </button>
+    </section>
+
+    <section class="flex flex-col gap-stack-md">
+      <h3 class="text-headline-md text-headline-md text-primary">Cajas</h3>
+      <div class="flex flex-col gap-base">
+        @for (box of boxes; track box.id) {
+          <a [routerLink]="['/boxes', box.id]"
+             class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-outline-variant/20 flex items-center gap-4 active:scale-[0.98] cursor-pointer transition-all hover:shadow-md">
+            <div class="w-14 h-14 rounded-xl bg-surface-container-high flex items-center justify-center shrink-0 text-on-surface-variant overflow-hidden">
+              @if (box.imageBase64) {
+                <img class="w-full h-full object-cover" [src]="box.imageBase64" [alt]="box.name"/>
+              } @else {
+                <span class="material-symbols-outlined text-2xl">inventory_2</span>
+              }
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="text-headline-md text-headline-md text-primary truncate">{{ box.name }}</h4>
+              @if (box.identifier) {
+                <p class="text-label-sm text-label-sm text-on-surface-variant">{{ box.identifier }}</p>
+              }
+              @if (box.items?.length) {
+                <p class="text-label-sm text-label-sm text-on-surface-variant mt-1">{{ box.items.length }} items</p>
+              }
+            </div>
+            <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+          </a>
+        } @empty {
+          <div class="py-12 text-center">
+            <span class="material-symbols-outlined text-4xl text-on-surface-variant block mb-2">inventory_2</span>
+            <p class="text-body-md text-body-md text-on-surface-variant">Esta zona no tiene cajas todavía</p>
+          </div>
+        }
+      </div>
     </section>
   }
 </main>

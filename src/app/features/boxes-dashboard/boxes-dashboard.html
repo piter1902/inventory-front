@@ -54,6 +54,12 @@
             <span class="material-symbols-outlined text-body-md" style="font-variation-settings: 'opsz' 20">inventory_2</span>
             <span class="text-label-md">{{ (box.items || []).length }} items</span>
           </div>
+          @if (zoneName(box.zoneId); as zName) {
+            <a [routerLink]="['/zones', box.zoneId]" class="inline-flex items-center gap-1 mt-2 text-label-sm text-label-sm text-secondary hover:underline" (click)="$event.stopPropagation()">
+              <span class="material-symbols-outlined text-[14px]">shelves</span>
+              {{ zName }}
+            </a>
+          }
           <div class="mt-4 flex items-center justify-between">
             <span class="bg-secondary-container/30 text-on-secondary-container px-3 py-1 rounded-lg text-label-sm">{{ box.identifier }}</span>
             <button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>

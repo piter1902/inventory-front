@@ -1,7 +1,9 @@
 import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ZonesService } from '../../services/zones.service';
-import { CreateZoneCommand, UpdateZoneRequest } from '../../models/zone.models';
+import { BoxesService } from '../../services/boxes.service';
+import { BoxDto } from '../../models/box.models';
+import { CreateZoneCommand, UpdateZoneCommand } from '../../models/zone.models';
 import { PageHeaderService } from '../../layout/page-header/page-header.service';
 
 @Component({
@@ -11,6 +13,7 @@ import { PageHeaderService } from '../../layout/page-header/page-header.service'
 })
 export class ZoneEdit implements OnInit {
   private zonesService = inject(ZonesService);
+  private boxesService = inject(BoxesService);
   private router = inject(Router);
   private readonly headerService = inject(PageHeaderService);
 
@@ -21,26 +24,62 @@ export class ZoneEdit implements OnInit {
   saving = signal(false);
   nameError = signal(false);
 
+  allBoxes = signal<BoxDto[]>([]);
+  selectedBoxIds = signal<Set<string>>(new Set());
+  searchQuery = signal('');
+
   constructor() {
     this.headerService.setTitle('Nueva Zona');
   }
 
   ngOnInit(): void {
+    this.boxesService.getAll().subscribe(data => this.allBoxes.set(data));
+
     const id = this.zoneId();
     if (id) {
       this.isEditing.set(true);
       this.headerService.setTitle('Editar Zona');
       this.zonesService.getById(id).subscribe(data => {
-        if (data) {
-          this.name.set(data.name ?? '');
-        }
+        this.name.set(data.name);
+        this.selectedBoxIds.set(new Set(data.boxes.map(b => b.id)));
       });
     }
+  }
+
+  get selectedBoxes(): BoxDto[] {
+    const ids = this.selectedBoxIds();
+    return this.allBoxes().filter(b => ids.has(b.id));
+  }
+
+  get availableBoxes(): BoxDto[] {
+    const ids = this.selectedBoxIds();
+    const q = this.searchQuery().toLowerCase().trim();
+    return this.allBoxes().filter(b => {
+      if (ids.has(b.id)) return false;
+      if (!q) return true;
+      return b.name?.toLowerCase().includes(q) || b.identifier?.toLowerCase().includes(q);
+    });
   }
 
   updateName(value: string): void {
     this.name.set(value);
     if (value.trim()) this.nameError.set(false);
+  }
+
+  toggleBox(boxId: string): void {
+    this.selectedBoxIds.update(ids => {
+      const next = new Set(ids);
+      if (next.has(boxId)) next.delete(boxId); else next.add(boxId);
+      return next;
+    });
+  }
+
+  removeBox(boxId: string): void {
+    this.selectedBoxIds.update(ids => {
+      const next = new Set(ids);
+      next.delete(boxId);
+      return next;
+    });
   }
 
   save(): void {
@@ -54,8 +93,12 @@ export class ZoneEdit implements OnInit {
     const id = this.zoneId();
 
     if (id) {
-      const request: UpdateZoneRequest = { name: trimmedName };
-      this.zonesService.update(id, request).subscribe({
+      const command: UpdateZoneCommand = {
+        id,
+        name: trimmedName,
+        boxIds: Array.from(this.selectedBoxIds()),
+      };
+      this.zonesService.update(id, command).subscribe({
         next: () => {
           this.saving.set(false);
           this.router.navigate(['/zones', id]);

@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { AuthService } from '../auth.service';
 import { take } from 'rxjs';
 
 @Component({
@@ -9,10 +10,9 @@ import { take } from 'rxjs';
   template: '',
 })
 export class AuthCallbackComponent implements OnInit {
-  constructor(
-    private readonly router: Router,
-    private readonly oidcSecurityService: OidcSecurityService,
-  ) {}
+  private readonly router = inject(Router);
+  private readonly oidcSecurityService = inject(OidcSecurityService);
+  private readonly authService = inject(AuthService);
 
   ngOnInit(): void {
     this.oidcSecurityService
@@ -20,7 +20,9 @@ export class AuthCallbackComponent implements OnInit {
       .pipe(take(1))
       .subscribe(({ isAuthenticated, errorMessage }) => {
         if (isAuthenticated) {
-          this.router.navigateByUrl('/boxes');
+          const redirect = this.authService.getRedirectUrl();
+          this.authService.clearRedirectUrl();
+          this.router.navigateByUrl(redirect);
         } else if (errorMessage) {
           this.router.navigateByUrl('/unauthorized');
         }

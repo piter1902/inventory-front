@@ -1,59 +1,53 @@
-# InventoryFront
+# BoxScan Inventory
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.11.
+Inventory management application built with Angular 21.
 
-## Development server
+## Prerequisites
 
-To start a local development server, run:
+- Node.js 22+
+- npm 10+
+- Docker (optional, for containerized deployment)
 
-```bash
-ng serve
+## Development
+
+```sh
+npm install
+npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Opens at `http://localhost:4200`.
 
-## Code scaffolding
+## Build
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```sh
+npm run build
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Output goes to `dist/inventory-front/browser`.
 
-```bash
-ng generate --help
+## Docker
+
+### Build and run standalone
+
+```sh
+docker build -t inventory-front .
+docker run -p 80:80 inventory-front
 ```
 
-## Building
+### Deploy with backend
 
-To build the project run:
-
-```bash
-ng build
+```sh
+cp .env.example .env
+# edit .env with your paths
+docker compose -f docker-compose.deploy.yml --env-file .env up -d
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Environment
 
-## Running unit tests
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `API_IMAGE` | `inventory-api:latest` | Backend image tag |
+| `API_CONTEXT` | `../inventory-api` | Path to backend project |
+| `API_DOCKERFILE` | `Dockerfile` | Backend Dockerfile name |
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Auth and API URL are configured in `src/environments/environment.ts` (dev) and `environment.prod.ts` (production).

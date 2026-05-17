@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { ZoneDto, CreateZoneCommand, UpdateZoneRequest } from '../models/zone.models';
+import { ZoneDto, ZoneDetailDto, CreateZoneCommand, UpdateZoneCommand } from '../models/zone.models';
 
 @Injectable({ providedIn: 'root' })
 export class ZonesService {
@@ -13,16 +13,16 @@ export class ZonesService {
     return this.http.get<ZoneDto[]>(this.baseUrl);
   }
 
-  getById(id: string): Observable<ZoneDto | null> {
-    return this.http.get<ZoneDto>(`${this.baseUrl}/${id}`);
+  getById(id: string): Observable<ZoneDetailDto> {
+    return this.http.get<ZoneDetailDto>(`${this.baseUrl}/${id}`);
   }
 
   create(command: CreateZoneCommand): Observable<ZoneDto> {
     return this.http.post<ZoneDto>(this.baseUrl, command);
   }
 
-  update(id: string, request: UpdateZoneRequest): Observable<ZoneDto> {
-    return this.http.put<ZoneDto>(`${this.baseUrl}/${id}`, request);
+  update(id: string, command: UpdateZoneCommand): Observable<ZoneDetailDto> {
+    return this.http.put<ZoneDetailDto>(`${this.baseUrl}/${id}`, command);
   }
 
   delete(id: string): Observable<void> {

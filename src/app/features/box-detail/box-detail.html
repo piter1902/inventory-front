@@ -19,6 +19,12 @@
       @if (box()?.description; as desc) {
         <p class="text-body-md text-body-md text-on-surface-variant text-center mt-1">{{ desc }}</p>
       }
+      @if (box()?.zoneId; as zoneId) {
+        <a [routerLink]="['/zones', zoneId]" class="inline-flex items-center gap-1 mt-2 text-label-sm text-label-sm text-secondary hover:underline">
+          <span class="material-symbols-outlined text-[14px]">shelves</span>
+          {{ zoneName() || 'Cargando...' }}
+        </a>
+      }
       <div class="flex gap-4 mt-2">
         <button class="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-variant transition-colors active:scale-95" (click)="share()">
           <span class="material-symbols-outlined text-[20px]">share</span>

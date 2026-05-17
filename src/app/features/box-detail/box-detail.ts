@@ -2,6 +2,7 @@ import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import QRCode from 'qrcode';
 import { BoxesService } from '../../services/boxes.service';
+import { ZonesService } from '../../services/zones.service';
 import { BoxDto } from '../../models/box.models';
 import { PageHeaderService } from '../../layout/page-header/page-header.service';
 
@@ -13,12 +14,14 @@ import { PageHeaderService } from '../../layout/page-header/page-header.service'
 })
 export class BoxDetail implements OnInit {
   private boxesService = inject(BoxesService);
+  private zonesService = inject(ZonesService);
   private router = inject(Router);
   private readonly headerService = inject(PageHeaderService);
 
   boxId = input.required<string>();
   box = signal<BoxDto | null>(null);
   qrDataUrl = signal('');
+  zoneName = signal<string | undefined>(undefined);
 
   get items() {
     return this.box()?.items ?? [];
@@ -29,6 +32,12 @@ export class BoxDetail implements OnInit {
       this.box.set(data);
       this.headerService.setTitle(data.name || 'Home Inventory');
       this.generateQr();
+      if (data.zoneId) {
+        this.zonesService.getById(data.zoneId).subscribe({
+          next: zone => this.zoneName.set(zone.name),
+          error: () => this.zoneName.set(data.zoneId),
+        });
+      }
     });
   }
 

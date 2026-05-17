@@ -5,6 +5,7 @@ export interface BoxDto {
   description?: string;
   qrUrl: string;
   imageBase64?: string;
+  zoneId?: string;
   items: ItemDto[];
 }
 
@@ -50,6 +51,7 @@ export interface SearchBoxResultDto {
   name?: string;
   description?: string;
   imageBase64?: string;
+  zoneName?: string;
 }
 
 export interface SearchItemResultDto {
@@ -58,4 +60,5 @@ export interface SearchItemResultDto {
   description?: string;
   boxId?: string;
   boxName?: string;
+  zoneName?: string;
 }
