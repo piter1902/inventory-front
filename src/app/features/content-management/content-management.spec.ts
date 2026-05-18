@@ -5,6 +5,7 @@ import { PageHeaderService } from '../../layout/page-header/page-header.service'
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { BoxDto } from '../../models/box.models';
+import { ImageService } from '../../services/image.service';
 
 describe('ContentManagement', () => {
   const mockBox: BoxDto = {
@@ -29,6 +30,7 @@ describe('ContentManagement', () => {
   };
   let mockRouter: { navigate: ReturnType<typeof vi.fn> };
   let mockPageHeaderService: { setTitle: ReturnType<typeof vi.fn> };
+  let mockImageService: { compressImage: ReturnType<typeof vi.fn> };
 
   afterEach(() => {
     vi.restoreAllMocks();
@@ -42,6 +44,7 @@ describe('ContentManagement', () => {
     };
     mockRouter = { navigate: vi.fn() };
     mockPageHeaderService = { setTitle: vi.fn() };
+    mockImageService = { compressImage: vi.fn() };
 
     await TestBed.configureTestingModule({
       imports: [ContentManagement],
@@ -49,6 +52,7 @@ describe('ContentManagement', () => {
         { provide: BoxesService, useValue: mockBoxesService },
         { provide: Router, useValue: mockRouter },
         { provide: PageHeaderService, useValue: mockPageHeaderService },
+        { provide: ImageService, useValue: mockImageService },
       ],
     }).compileComponents();
 
@@ -274,27 +278,16 @@ describe('ContentManagement', () => {
   });
 
   describe('onPhotoSelected', () => {
-    it('should update imagePreview and imageBase64', () => {
-      const mockReader = {
-        result: 'data:image/png;base64,newphoto',
-        onload: null as any,
-        readAsDataURL: vi.fn(function (this: any) {
-          if (this.onload) {
-            this.onload({ target: this } as any);
-          }
-        }),
-      };
-      vi.spyOn(window, 'FileReader').mockImplementation(function () {
-        return mockReader;
-      } as any);
-
+    it('should compress and update imagePreview and imageBase64', async () => {
+      mockImageService.compressImage.mockResolvedValue('data:image/jpeg;base64,compressed');
       const file = new File(['test'], 'photo.png', { type: 'image/png' });
       const event = { target: { files: [file] } } as unknown as Event;
 
-      component.onPhotoSelected(event);
+      await component.onPhotoSelected(event);
 
-      expect(component.imagePreview()).toBe('data:image/png;base64,newphoto');
-      expect(component.imageBase64()).toBe('data:image/png;base64,newphoto');
+      expect(mockImageService.compressImage).toHaveBeenCalledWith(file);
+      expect(component.imagePreview()).toBe('data:image/jpeg;base64,compressed');
+      expect(component.imageBase64()).toBe('data:image/jpeg;base64,compressed');
     });
   });
 });

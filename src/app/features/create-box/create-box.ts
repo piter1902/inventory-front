@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { BoxesService } from '../../services/boxes.service';
 import { CreateBoxCommand } from '../../models/box.models';
 import { PageHeaderService } from '../../layout/page-header/page-header.service';
+import { ImageService } from '../../services/image.service';
 
 interface PendingItem {
   id: string;
@@ -18,6 +19,7 @@ interface PendingItem {
 })
 export class CreateBox {
   private boxesService = inject(BoxesService);
+  private imageService = inject(ImageService);
   private router = inject(Router);
 
   constructor() {
@@ -67,15 +69,12 @@ export class CreateBox {
     this.items.update(list => list.filter(i => i.id !== id));
   }
 
-  onPhotoSelected(event: Event): void {
+  async onPhotoSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.imageBase64.set(reader.result as string);
-    };
-    reader.readAsDataURL(file);
+    const compressed = await this.imageService.compressImage(file);
+    this.imageBase64.set(compressed);
   }
 
   create(): void {

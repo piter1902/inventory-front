@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { BoxesService } from '../../services/boxes.service';
 import { UpdateItemRequest } from '../../models/box.models';
 import { PageHeaderService } from '../../layout/page-header/page-header.service';
+import { ImageService } from '../../services/image.service';
 
 interface EditableItem {
   id: string;
@@ -20,6 +21,7 @@ interface EditableItem {
 })
 export class ContentManagement implements OnInit {
   private boxesService = inject(BoxesService);
+  private imageService = inject(ImageService);
   private router = inject(Router);
   private readonly headerService = inject(PageHeaderService);
 
@@ -112,18 +114,14 @@ export class ContentManagement implements OnInit {
     }
   }
 
-  onPhotoSelected(event: Event): void {
+  async onPhotoSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      this.imagePreview.set(result);
-      this.imageBase64.set(result);
-    };
-    reader.readAsDataURL(file);
+    const compressed = await this.imageService.compressImage(file);
+    this.imagePreview.set(compressed);
+    this.imageBase64.set(compressed);
   }
 
   deleteBox(): void {
