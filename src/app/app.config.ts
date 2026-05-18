@@ -1,7 +1,7 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { provideAuth, authInterceptor } from 'angular-auth-oidc-client';
+import { provideAuth, authInterceptor, AbstractSecurityStorage, DefaultLocalStorageService } from 'angular-auth-oidc-client';
 
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
@@ -26,5 +26,6 @@ export const appConfig: ApplicationConfig = {
         unauthorizedRoute: '/unauthorized',
       },
     }),
+    { provide: AbstractSecurityStorage, useClass: DefaultLocalStorageService },
   ],
 };
