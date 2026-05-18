@@ -1,0 +1,23 @@
+<div class="fixed top-16 right-4 z-50 flex flex-col gap-2 pointer-events-none">
+  @for (notification of notificationService.notifications(); track notification.id) {
+    <div
+      class="notification pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-xl shadow-lg"
+      [class.notification--error]="notification.type === 'error'"
+      [class.notification--success]="notification.type === 'success'"
+      [class.notification--info]="notification.type === 'info'"
+      (click)="notificationService.remove(notification.id)"
+    >
+      <span class="material-symbols-outlined text-[20px] flex-shrink-0 mt-0.5">
+        @switch (notification.type) {
+          @case ('success') { check_circle }
+          @case ('info') { info }
+          @default { error }
+        }
+      </span>
+      <span class="text-body-md flex-1">{{ notification.message }}</span>
+      <button class="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full hover:bg-surface-container-high transition-colors">
+        <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+    </div>
+  }
+</div>

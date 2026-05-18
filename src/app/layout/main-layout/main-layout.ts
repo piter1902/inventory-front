@@ -4,10 +4,11 @@ import { filter, map } from 'rxjs/operators';
 import { BottomNav } from '../bottom-nav/bottom-nav';
 import { PageHeader } from '../page-header/page-header';
 import { PageHeaderService } from '../page-header/page-header.service';
+import { Notifications } from '../../shared/notifications/notifications';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [RouterOutlet, BottomNav, PageHeader],
+  imports: [RouterOutlet, BottomNav, PageHeader, Notifications],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.scss',
 })

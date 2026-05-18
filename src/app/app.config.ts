@@ -5,12 +5,13 @@ import { provideAuth, authInterceptor } from 'angular-auth-oidc-client';
 
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
+import { httpErrorInterceptor } from './services/http-error.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withComponentInputBinding(), withInMemoryScrolling({ scrollPositionRestoration: 'enabled' })),
-    provideHttpClient(withInterceptors([authInterceptor()])),
+    provideHttpClient(withInterceptors([authInterceptor(), httpErrorInterceptor])),
     provideAuth({
       config: {
         authority: environment.auth.authority,
