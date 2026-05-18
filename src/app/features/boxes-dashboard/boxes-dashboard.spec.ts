@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { BoxesDashboard } from './boxes-dashboard';
 import { BoxesService } from '../../services/boxes.service';
+import { ZonesService } from '../../services/zones.service';
 import { PageHeaderService } from '../../layout/page-header/page-header.service';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
@@ -16,11 +17,13 @@ describe('BoxesDashboard', () => {
   let fixture: any;
   let component: BoxesDashboard;
   let mockBoxesService: { getAll: ReturnType<typeof vi.fn> };
+  let mockZonesService: { getAll: ReturnType<typeof vi.fn> };
   let mockRouter: { navigate: ReturnType<typeof vi.fn> };
   let mockPageHeaderService: { setTitle: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
     mockBoxesService = { getAll: vi.fn(() => of(mockBoxes)) };
+    mockZonesService = { getAll: vi.fn(() => of([])) };
     mockRouter = { navigate: vi.fn() };
     mockPageHeaderService = { setTitle: vi.fn() };
 
@@ -28,6 +31,7 @@ describe('BoxesDashboard', () => {
       imports: [BoxesDashboard],
       providers: [
         { provide: BoxesService, useValue: mockBoxesService },
+        { provide: ZonesService, useValue: mockZonesService },
         { provide: Router, useValue: mockRouter },
         { provide: PageHeaderService, useValue: mockPageHeaderService },
       ],
