@@ -124,6 +124,11 @@ export class ContentManagement implements OnInit {
     this.imageBase64.set(compressed);
   }
 
+  removeImage(): void {
+    this.imagePreview.set(null);
+    this.imageBase64.set(null);
+  }
+
   deleteBox(): void {
     if (!confirm('¿Estás seguro de que quieres eliminar esta caja y todo su contenido?')) return;
     this.saving.set(true);

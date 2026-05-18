@@ -155,6 +155,7 @@ input, textarea { font-family: inherit; }
 .text-on-secondary-container { color: var(--color-on-secondary-container); }
 .text-outline { color: var(--color-outline); }
 .text-error { color: var(--color-error); }
+.text-on-error-container { color: var(--color-on-error-container); }
 .text-secondary { color: var(--color-secondary); }
 
 .bg-surface { background-color: var(--color-surface); }

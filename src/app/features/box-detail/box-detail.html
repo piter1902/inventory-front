@@ -1,39 +1,46 @@
 <main class="px-container-padding-mobile md:px-container-padding-desktop py-stack-md flex flex-col gap-stack-lg max-w-2xl mx-auto">
-  <section class="bg-surface-container-lowest rounded-[1.5rem] p-stack-lg shadow-sm border border-outline-variant/30 flex flex-col items-center gap-base">
-    <div class="relative group w-full flex justify-center">
-      <div class="absolute -inset-2 border-2 border-secondary rounded-xl opacity-20"></div>
-      <div class="w-48 h-48 bg-white rounded-xl flex items-center justify-center overflow-hidden border-4 border-secondary/10 shadow-sm">
-        @if (qrDataUrl()) {
-          <img
-            alt="QR Code for {{ box()?.identifier }}"
-            class="w-full h-full object-contain p-1"
-            [src]="qrDataUrl()"/>
-        } @else {
-          <span class="material-symbols-outlined text-6xl text-on-surface-variant">qr_code_2</span>
-        }
+  <section class="bg-surface-container-lowest rounded-[1.5rem] shadow-sm border border-outline-variant/30 flex flex-col items-center gap-base overflow-hidden">
+    @if (box()?.imageBase64; as img) {
+      <div class="w-full h-40 bg-surface-container-high overflow-hidden">
+        <img [src]="img" alt="Imagen de {{ box()?.name || 'la caja' }}" class="w-full h-full object-cover"/>
       </div>
-    </div>
-    <div class="mt-base flex flex-col items-center gap-1">
-      <p class="text-body-md text-body-md text-on-surface-variant">Código Identificador de Caja</p>
-      <p class="text-headline-md text-headline-md text-primary">{{ box()?.identifier }}</p>
-      @if (box()?.description; as desc) {
-        <p class="text-body-md text-body-md text-on-surface-variant text-center mt-1">{{ desc }}</p>
-      }
-      @if (box()?.zoneId; as zoneId) {
-        <a [routerLink]="['/zones', zoneId]" class="inline-flex items-center gap-1 mt-2 text-label-sm text-label-sm text-secondary hover:underline">
-          <span class="material-symbols-outlined text-[14px]">shelves</span>
-          {{ zoneName() || 'Cargando...' }}
-        </a>
-      }
-      <div class="flex gap-4 mt-2">
-        <button class="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-variant transition-colors active:scale-95" (click)="share()">
-          <span class="material-symbols-outlined text-[20px]">share</span>
-          <span class="text-label-md text-label-md">Compartir</span>
-        </button>
-        <button class="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-variant transition-colors active:scale-95" (click)="exportBox()">
-          <span class="material-symbols-outlined text-[20px]">file_download</span>
-          <span class="text-label-md text-label-md">Exportar</span>
-        </button>
+    }
+    <div class="flex flex-col items-center gap-base p-stack-lg w-full">
+      <div class="relative group w-full flex justify-center">
+        <div class="absolute -inset-2 border-2 border-secondary rounded-xl opacity-20"></div>
+        <div class="w-48 h-48 bg-white rounded-xl flex items-center justify-center overflow-hidden border-4 border-secondary/10 shadow-sm">
+          @if (qrDataUrl()) {
+            <img
+              alt="QR Code for {{ box()?.identifier }}"
+              class="w-full h-full object-contain p-1"
+              [src]="qrDataUrl()"/>
+          } @else {
+            <span class="material-symbols-outlined text-6xl text-on-surface-variant">qr_code_2</span>
+          }
+        </div>
+      </div>
+      <div class="mt-base flex flex-col items-center gap-1">
+        <p class="text-body-md text-body-md text-on-surface-variant">Código Identificador de Caja</p>
+        <p class="text-headline-md text-headline-md text-primary">{{ box()?.identifier }}</p>
+        @if (box()?.description; as desc) {
+          <p class="text-body-md text-body-md text-on-surface-variant text-center mt-1">{{ desc }}</p>
+        }
+        @if (box()?.zoneId; as zoneId) {
+          <a [routerLink]="['/zones', zoneId]" class="inline-flex items-center gap-1 mt-2 text-label-sm text-label-sm text-secondary hover:underline">
+            <span class="material-symbols-outlined text-[14px]">shelves</span>
+            {{ zoneName() || 'Cargando...' }}
+          </a>
+        }
+        <div class="flex gap-4 mt-2">
+          <button class="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-variant transition-colors active:scale-95" (click)="share()">
+            <span class="material-symbols-outlined text-[20px]">share</span>
+            <span class="text-label-md text-label-md">Compartir</span>
+          </button>
+          <button class="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-variant transition-colors active:scale-95" (click)="exportBox()">
+            <span class="material-symbols-outlined text-[20px]">file_download</span>
+            <span class="text-label-md text-label-md">Exportar</span>
+          </button>
+        </div>
       </div>
     </div>
   </section>

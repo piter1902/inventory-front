@@ -17,7 +17,6 @@ export class BoxDetail implements OnInit {
   private zonesService = inject(ZonesService);
   private router = inject(Router);
   private readonly headerService = inject(PageHeaderService);
-
   boxId = input.required<string>();
   box = signal<BoxDto | null>(null);
   qrDataUrl = signal('');

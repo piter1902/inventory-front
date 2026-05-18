@@ -25,6 +25,12 @@
       <button type="button" class="absolute bottom-4 right-4 w-12 h-12 bg-secondary text-on-secondary rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform" (click)="fileInput.click()">
         <span class="material-symbols-outlined">edit</span>
       </button>
+      @if (imagePreview()) {
+        <button type="button" class="mt-2 w-full flex items-center justify-center gap-2 py-2 rounded-xl text-error hover:bg-error-container/10 transition-colors active:scale-[0.99]" (click)="removeImage()">
+          <span class="material-symbols-outlined text-[20px]">delete</span>
+          <span class="text-label-md text-label-md">Quitar imagen</span>
+        </button>
+      }
     </section>
 
     <!-- Form Fields -->
