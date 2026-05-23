@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../environments/environment';
-import { BoxDto, CreateBoxCommand, UpdateBoxRequest, SearchResultDto } from '../models/box.models';
+import { BoxDto, CreateBoxCommand, UpdateBoxRequest, SearchResultDto, BoxLogEntry } from '../models/box.models';
 
 @Injectable({ providedIn: 'root' })
 export class BoxesService {
@@ -33,5 +33,14 @@ export class BoxesService {
 
   search(query: string): Observable<SearchResultDto> {
     return this.http.get<SearchResultDto>(`${this.baseUrl}/search`, { params: { query } });
+  }
+
+  getLogs(boxId: string): Observable<BoxLogEntry[]> {
+    return this.http.get<BoxLogEntry[]>(`${this.baseUrl}/${boxId}/logs`);
+  }
+
+  getAllLogs(boxId?: string): Observable<BoxLogEntry[]> {
+    const params = boxId ? new HttpParams().set('boxId', boxId) : undefined;
+    return this.http.get<BoxLogEntry[]>(`${environment.apiBaseUrl}/api/logs`, { params });
   }
 }

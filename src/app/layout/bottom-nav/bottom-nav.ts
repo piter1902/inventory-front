@@ -1,6 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-bottom-nav',
@@ -9,9 +8,13 @@ import { AuthService } from '../../auth/auth.service';
   styleUrl: './bottom-nav.scss',
 })
 export class BottomNav {
-  private readonly authService = inject(AuthService);
+  protected drawerOpen = signal(false);
 
-  protected onLogin(): void {
-    this.authService.login();
+  protected toggleDrawer(): void {
+    this.drawerOpen.update(v => !v);
+  }
+
+  protected closeDrawer(): void {
+    this.drawerOpen.set(false);
   }
 }

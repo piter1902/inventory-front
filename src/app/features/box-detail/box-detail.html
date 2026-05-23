@@ -72,5 +72,50 @@
       }
     </div>
   </section>
+
+  <section class="flex flex-col gap-stack-md">
+    <button class="flex items-center justify-between w-full p-4 rounded-xl bg-surface-container-low hover:bg-surface-container-high transition-colors" (click)="toggleLogs()">
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-secondary">swap_horiz</span>
+        <span class="text-headline-md text-headline-md text-primary">Movimientos</span>
+      </div>
+      <span class="material-symbols-outlined text-on-surface-variant transition-transform" [class.rotate-180]="showLogs()">expand_more</span>
+    </button>
+
+    @if (showLogs()) {
+      @if (logsLoading()) {
+        <div class="flex items-center justify-center py-8">
+          <span class="material-symbols-outlined animate-spin text-secondary text-2xl">progress_activity</span>
+        </div>
+      } @else if (logs().length === 0) {
+        <div class="py-8 text-center">
+          <span class="material-symbols-outlined text-4xl text-on-surface-variant block mb-2">history</span>
+          <p class="text-body-md text-body-md text-on-surface-variant">No hay movimientos registrados</p>
+        </div>
+      } @else {
+        <div class="space-y-stack-sm">
+          @for (log of logs(); track log.id) {
+            <div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/20">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-secondary-container/20 flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-secondary">swap_horiz</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-body-md text-body-md text-on-surface">{{ log.itemName }}</p>
+                  <p class="text-label-sm text-label-sm text-on-surface-variant">
+                    {{ log.sourceBoxName }} <span class="material-symbols-outlined text-[14px] align-text-bottom">arrow_forward</span> {{ log.destinationBoxName }}
+                  </p>
+                </div>
+                <div class="text-right shrink-0">
+                  <p class="text-label-sm text-label-sm text-on-surface-variant">{{ log.movedAt | date:'short' }}</p>
+                  <p class="text-label-sm text-label-sm text-on-surface-variant/60">{{ log.movedBy }}</p>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+  </section>
 </main>
 

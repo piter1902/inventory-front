@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../environments/environment';
-import { BoxDto, AddItemRequest, UpdateItemRequest } from '../models/box.models';
+import { BoxDto, AddItemRequest, UpdateItemRequest, MoveItemsRequest, MoveItemsResult } from '../models/box.models';
 
 @Injectable({ providedIn: 'root' })
 export class ItemsService {
@@ -21,5 +21,9 @@ export class ItemsService {
 
   delete(boxId: string, itemId: string): Observable<BoxDto> {
     return this.http.delete<BoxDto>(`${this.baseUrl}/${boxId}/items/${itemId}`);
+  }
+
+  move(sourceBoxId: string, request: MoveItemsRequest): Observable<MoveItemsResult> {
+    return this.http.post<MoveItemsResult>(`${this.baseUrl}/${sourceBoxId}/items/move`, request);
   }
 }

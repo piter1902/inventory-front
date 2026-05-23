@@ -80,6 +80,11 @@ export class BoxesDashboard implements OnInit {
     this.router.navigate(['/boxes', id, 'edit']);
   }
 
+  moveItemsFromBox(id: string): void {
+    this.closeMenu();
+    this.router.navigate(['/boxes', id, 'move-items']);
+  }
+
   deleteBox(event: MouseEvent, id: string, name: string): void {
     event.stopPropagation();
     this.closeMenu();

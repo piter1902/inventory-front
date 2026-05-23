@@ -62,3 +62,34 @@ export interface SearchItemResultDto {
   boxName?: string;
   zoneName?: string;
 }
+
+export interface MoveItemsRequest {
+  itemIds: string[];
+  destinationBoxId: string;
+}
+
+export interface ItemMoveResult {
+  itemId: string;
+  itemName: string | null;
+  success: boolean;
+  error: string | null;
+}
+
+export interface MoveItemsResult {
+  totalItems: number;
+  successCount: number;
+  failureCount: number;
+  results: ItemMoveResult[];
+}
+
+export interface BoxLogEntry {
+  id: string;
+  itemId: string;
+  itemName: string;
+  sourceBoxId: string;
+  sourceBoxName: string;
+  destinationBoxId: string;
+  destinationBoxName: string;
+  movedBy: string;
+  movedAt: string;
+}

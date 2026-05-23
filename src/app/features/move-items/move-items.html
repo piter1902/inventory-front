@@ -1,0 +1,200 @@
+<main class="px-container-padding-mobile md:px-container-padding-desktop pt-stack-md max-w-2xl mx-auto mb-40">
+  @if (result(); as res) {
+    <section class="space-y-stack-lg">
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-3xl text-secondary">swap_horiz</span>
+        <h2 class="text-headline-md text-headline-md text-primary">Resultado</h2>
+      </div>
+      <div class="flex gap-3">
+        <span class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full text-label-sm">{{ res.totalItems }} items</span>
+        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-label-sm dark:bg-green-900 dark:text-green-200">{{ res.successCount }} correctos</span>
+        @if (res.failureCount > 0) {
+          <span class="bg-error-container text-on-error-container px-3 py-1 rounded-full text-label-sm">{{ res.failureCount }} fallos</span>
+        }
+      </div>
+      @if (res.results?.length) {
+        <div class="space-y-stack-sm">
+          @for (r of res.results; track r.itemId) {
+            <div
+              class="flex items-center gap-3 p-4 rounded-xl border"
+              [class.bg-surface-container-low]="r.success"
+              [class.border-outline-variant/30]="r.success"
+              [class.bg-error-container/10]="!r.success"
+              [class.border-error/30]="!r.success">
+              <span class="material-symbols-outlined" [class.text-green-600]="r.success" [class.text-error]="!r.success">
+                {{ r.success ? 'check_circle' : 'error' }}
+              </span>
+              <div class="flex-1 min-w-0">
+                <p class="text-body-md text-body-md text-on-surface">{{ r.itemName }}</p>
+                @if (r.error) {
+                  <p class="text-label-sm text-label-sm text-error mt-0.5">{{ r.error }}</p>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+      <div class="flex gap-3">
+        <button class="flex-1 h-12 bg-secondary text-on-secondary rounded-xl text-label-md text-label-md font-bold active:scale-95 transition-transform" (click)="goToBox(destinationBoxId()!)">
+          Ir a caja destino
+        </button>
+        <button class="flex-1 h-12 bg-surface-container-high text-on-surface rounded-xl text-label-md text-label-md font-bold active:scale-95 transition-transform" (click)="reset()">
+          Mover más items
+        </button>
+      </div>
+    </section>
+  } @else {
+    <!-- Source box info -->
+    @if (sourceBox(); as box) {
+      <section class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/30 mb-stack-lg">
+        <p class="text-label-sm text-label-sm text-on-surface-variant mb-1">Caja origen</p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-secondary-container flex items-center justify-center">
+            <span class="material-symbols-outlined text-on-secondary-container">inventory_2</span>
+          </div>
+          <div>
+            <p class="text-headline-md text-headline-md text-primary">{{ box.name }}</p>
+            <p class="text-label-sm text-label-sm text-on-surface-variant">{{ box.identifier }}</p>
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- Items list -->
+    <section class="space-y-stack-md">
+      <div class="flex items-center justify-between">
+        <h2 class="text-headline-md text-headline-md text-primary">Items</h2>
+        <div class="flex gap-2">
+          <button class="text-label-sm text-label-sm text-secondary hover:underline" (click)="selectAll()">Seleccionar todos</button>
+          <button class="text-label-sm text-label-sm text-on-surface-variant hover:underline" (click)="deselectAll()">Deseleccionar</button>
+        </div>
+      </div>
+
+      @if (sourceBox()?.items; as items) {
+        <div class="space-y-stack-sm">
+          @for (item of items; track item.id) {
+            <div
+              class="flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-colors"
+              [class.bg-primary-container/20]="selectedItemIds().has(item.id)"
+              [class.border-primary/30]="selectedItemIds().has(item.id)"
+              [class.bg-surface-container-low]="!selectedItemIds().has(item.id)"
+              [class.border-outline-variant/20]="!selectedItemIds().has(item.id)"
+              (click)="toggleItem(item.id)">
+              <div
+                class="w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors shrink-0"
+                [class.bg-primary]="selectedItemIds().has(item.id)"
+                [class.border-primary]="selectedItemIds().has(item.id)"
+                [class.border-outline-variant]="!selectedItemIds().has(item.id)">
+                @if (selectedItemIds().has(item.id)) {
+                  <span class="material-symbols-outlined text-[16px] text-on-primary">check</span>
+                }
+              </div>
+              <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-outline">inventory_2</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-body-md text-body-md text-on-surface">{{ item.name }}</p>
+                @if (item.description) {
+                  <p class="text-label-sm text-label-sm text-on-surface-variant truncate">{{ item.description }}</p>
+                }
+              </div>
+            </div>
+          } @empty {
+            <div class="py-8 text-center">
+              <span class="material-symbols-outlined text-4xl text-on-surface-variant block mb-2">inventory_2</span>
+              <p class="text-body-md text-body-md text-on-surface-variant">Esta caja no tiene items</p>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- Destination box selector -->
+    <section class="mt-stack-xl space-y-stack-md">
+      <h2 class="text-headline-md text-headline-md text-primary">Caja destino</h2>
+
+      @if (destinationBox; as dest) {
+        <div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/30 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-secondary-container flex items-center justify-center">
+            <span class="material-symbols-outlined text-on-secondary-container">drive_file_move</span>
+          </div>
+          <div class="flex-1">
+            <p class="text-body-md text-body-md text-on-surface">{{ dest.name }}</p>
+            <p class="text-label-sm text-label-sm text-on-surface-variant">{{ dest.identifier }}</p>
+          </div>
+          <button class="material-symbols-outlined text-on-surface-variant hover:text-error transition-colors" (click)="clearDestination()">close</button>
+        </div>
+      } @else {
+        <button
+          class="w-full flex items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-outline-variant text-on-surface-variant hover:bg-surface-container-low transition-colors"
+          (click)="openDestinationPicker()">
+          <span class="material-symbols-outlined">add</span>
+          <span class="text-body-md text-body-md">Seleccionar caja destino</span>
+        </button>
+      }
+    </section>
+
+    <!-- Destination picker modal -->
+    @if (showDestinationPicker()) {
+      <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+        <div class="fixed inset-0 bg-black/40" (click)="showDestinationPicker.set(false)"></div>
+        <div class="relative w-full sm:max-w-md bg-surface-bright rounded-t-2xl sm:rounded-2xl shadow-xl max-h-[70vh] flex flex-col overflow-hidden">
+          <div class="p-4 border-b border-outline-variant/20">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-headline-md text-headline-md text-primary">Seleccionar caja destino</h3>
+              <button class="material-symbols-outlined text-on-surface-variant" (click)="showDestinationPicker.set(false)">close</button>
+            </div>
+            <div class="relative group">
+              <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                <span class="material-symbols-outlined text-outline leading-none">search</span>
+              </div>
+              <input
+                class="w-full h-12 pl-12 pr-4 bg-surface-container rounded-xl focus:ring-2 focus:outline-none focus:bg-surface-container-lowest transition-all text-body-md text-on-surface placeholder:text-outline shadow-sm"
+                placeholder="Buscar caja..."
+                type="text"
+                (input)="destinationSearch.set($any($event.target).value)"/>
+            </div>
+          </div>
+          <div class="flex-1 overflow-y-auto p-2">
+            @for (box of filteredDestinationBoxes; track box.id) {
+              <button
+                class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container-high transition-colors text-left"
+                (click)="selectDestination(box.id)">
+                <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-outline">inventory_2</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-body-md text-body-md text-on-surface">{{ box.name }}</p>
+                  <p class="text-label-sm text-label-sm text-on-surface-variant">{{ box.identifier }} · {{ (box.items || []).length }} items</p>
+                </div>
+                @if (destinationBoxId() === box.id) {
+                  <span class="material-symbols-outlined text-secondary">check_circle</span>
+                }
+              </button>
+            } @empty {
+              <p class="text-center text-body-md text-body-md text-on-surface-variant py-8">No se encontraron cajas</p>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Move button -->
+    @if (selectedItemIds().size > 0 && destinationBoxId()) {
+      <div class="fixed bottom-24 left-0 w-full px-container-padding-mobile flex justify-center z-40">
+        <button
+          class="w-full max-w-md h-14 bg-secondary text-on-secondary rounded-full text-label-md text-label-md font-bold shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-transform duration-150"
+          [class.opacity-60]="moving()"
+          [disabled]="moving()"
+          (click)="move()">
+          @if (moving()) {
+            <span>Moviendo...</span>
+          } @else {
+            <span class="material-symbols-outlined">drive_file_move</span>
+            <span>Mover {{ selectedItemIds().size }} items a {{ destinationBox?.name }}</span>
+          }
+        </button>
+      </div>
+    }
+  }
+</main>

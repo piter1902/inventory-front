@@ -60,6 +60,15 @@ export const routes: Routes = [
         data: { showBack: false },
         loadComponent: () => import('./features/import-excel/import-excel').then(m => m.ImportExcel),
       },
+      {
+        path: 'boxes/:boxId/move-items',
+        loadComponent: () => import('./features/move-items/move-items').then(m => m.MoveItems),
+      },
+      {
+        path: 'logs',
+        data: { showBack: false },
+        loadComponent: () => import('./features/logs/logs').then(m => m.Logs),
+      },
     ],
   },
 ];

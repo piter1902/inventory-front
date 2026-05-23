@@ -1,0 +1,61 @@
+<main class="px-container-padding-mobile md:px-container-padding-desktop pt-stack-md max-w-4xl mx-auto mb-40">
+  <section class="space-y-stack-md">
+    <div class="flex flex-wrap items-center gap-2">
+      <button
+        class="px-4 py-3 rounded-full text-label-md text-label-md transition-colors"
+        [class.bg-secondary-container]="!filterBoxId()"
+        [class.text-on-secondary-container]="!filterBoxId()"
+        [class.bg-surface-container-high]="filterBoxId()"
+        [class.text-on-surface-variant]="filterBoxId()"
+        (click)="applyFilter(null)">
+        Todas
+      </button>
+      @for (box of allBoxes(); track box.id) {
+        <button
+          class="px-4 py-3 rounded-full text-label-md text-label-md transition-colors"
+          [class.bg-secondary-container]="filterBoxId() === box.id"
+          [class.text-on-secondary-container]="filterBoxId() === box.id"
+          [class.bg-surface-container-high]="filterBoxId() !== box.id"
+          [class.text-on-surface-variant]="filterBoxId() !== box.id"
+          (click)="applyFilter(box.id)">
+          {{ box.name }}
+        </button>
+      }
+    </div>
+
+    @if (loading()) {
+      <div class="flex items-center justify-center py-16">
+        <span class="material-symbols-outlined animate-spin text-secondary text-3xl">progress_activity</span>
+      </div>
+    } @else if (filteredLogs.length === 0) {
+      <div class="py-16 text-center">
+        <span class="material-symbols-outlined text-5xl text-on-surface-variant block mb-3">history</span>
+        <p class="text-body-md text-body-md text-on-surface-variant">No hay movimientos registrados</p>
+      </div>
+    } @else {
+      <div class="space-y-stack-sm">
+        @for (log of filteredLogs; track log.id) {
+          <div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/20">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-secondary-container/20 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-secondary">swap_horiz</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-body-md text-body-md text-on-surface">{{ log.itemName }}</p>
+                <p class="text-label-sm text-label-sm text-on-surface-variant">
+                  {{ log.sourceBoxName }}
+                  <span class="material-symbols-outlined text-[14px] align-text-bottom">arrow_forward</span>
+                  {{ log.destinationBoxName }}
+                </p>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="text-label-sm text-label-sm text-on-surface-variant">{{ log.movedAt | date:'short' }}</p>
+                <p class="text-label-sm text-label-sm text-on-surface-variant/60">{{ log.movedBy }}</p>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </section>
+</main>

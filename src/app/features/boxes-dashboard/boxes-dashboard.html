@@ -83,6 +83,10 @@
                     <span class="material-symbols-outlined text-[20px]">edit</span>
                     Modificar
                   </button>
+                  <button class="w-full flex items-center gap-3 px-4 py-3 text-on-surface hover:bg-surface-container-high transition-colors text-label-md" (click)="moveItemsFromBox(box.id)">
+                    <span class="material-symbols-outlined text-[20px]">drive_file_move</span>
+                    Mover items
+                  </button>
                   <div class="h-px bg-outline-variant/30 my-1"></div>
                   <button class="w-full flex items-center gap-3 px-4 py-3 text-error hover:bg-error-container/20 transition-colors text-label-md" (click)="deleteBox($event, box.id, box.name)">
                     <span class="material-symbols-outlined text-[20px]">delete</span>

@@ -1,14 +1,15 @@
 import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import QRCode from 'qrcode';
 import { BoxesService } from '../../services/boxes.service';
 import { ZonesService } from '../../services/zones.service';
-import { BoxDto } from '../../models/box.models';
+import { BoxDto, BoxLogEntry } from '../../models/box.models';
 import { PageHeaderService } from '../../layout/page-header/page-header.service';
 
 @Component({
   selector: 'app-box-detail',
-  imports: [RouterLink],
+  imports: [RouterLink, DatePipe],
   templateUrl: './box-detail.html',
   styleUrl: './box-detail.scss',
 })
@@ -21,6 +22,9 @@ export class BoxDetail implements OnInit {
   box = signal<BoxDto | null>(null);
   qrDataUrl = signal('');
   zoneName = signal<string | undefined>(undefined);
+  logs = signal<BoxLogEntry[]>([]);
+  showLogs = signal(false);
+  logsLoading = signal(false);
 
   get items() {
     return this.box()?.items ?? [];
@@ -38,6 +42,24 @@ export class BoxDetail implements OnInit {
         });
       }
     });
+  }
+
+  toggleLogs(): void {
+    if (this.showLogs()) {
+      this.showLogs.set(false);
+      return;
+    }
+    this.showLogs.set(true);
+    if (this.logs().length === 0) {
+      this.logsLoading.set(true);
+      this.boxesService.getLogs(this.boxId()).subscribe({
+        next: data => {
+          this.logs.set(data);
+          this.logsLoading.set(false);
+        },
+        error: () => this.logsLoading.set(false),
+      });
+    }
   }
 
   private generateQr(): void {

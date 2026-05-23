@@ -28,7 +28,7 @@ describe('BoxDetail', () => {
 
   let fixture: any;
   let component: BoxDetail;
-  let mockBoxesService: { getById: ReturnType<typeof vi.fn> };
+  let mockBoxesService: { getById: ReturnType<typeof vi.fn>; getLogs: ReturnType<typeof vi.fn> };
   let mockPageHeaderService: { setTitle: ReturnType<typeof vi.fn> };
   let navigateSpy: ReturnType<typeof vi.spyOn>;
 
@@ -37,7 +37,7 @@ describe('BoxDetail', () => {
   });
 
   beforeEach(async () => {
-    mockBoxesService = { getById: vi.fn(() => of(mockBox)) };
+    mockBoxesService = { getById: vi.fn(() => of(mockBox)), getLogs: vi.fn(() => of([])) };
     mockPageHeaderService = { setTitle: vi.fn() };
 
     await TestBed.configureTestingModule({
@@ -181,7 +181,30 @@ describe('BoxDetail', () => {
     });
   });
 
-  describe('dataUriToBlob', () => {
+  describe('logs', () => {
+  it('should not load logs on init', () => {
+    fixture.detectChanges();
+    expect(mockBoxesService.getLogs).not.toHaveBeenCalled();
+    expect(component.showLogs()).toBe(false);
+  });
+
+  it('should load logs on first toggle', () => {
+    fixture.detectChanges();
+    component.toggleLogs();
+    expect(component.showLogs()).toBe(true);
+    expect(mockBoxesService.getLogs).toHaveBeenCalledWith('box-1');
+  });
+
+  it('should hide logs on second toggle without refetch', () => {
+    fixture.detectChanges();
+    component.toggleLogs();
+    expect(mockBoxesService.getLogs).toHaveBeenCalledTimes(1);
+    component.toggleLogs();
+    expect(component.showLogs()).toBe(false);
+  });
+});
+
+describe('dataUriToBlob', () => {
     it('should convert data URI to Blob with correct MIME type', () => {
       const dataUri = 'data:image/png;base64,QUJDRA==';
       const blob = (component as any).dataUriToBlob(dataUri);
