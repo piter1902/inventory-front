@@ -31,7 +31,7 @@ describe('App Routes', () => {
     expect(route.canActivate!.length).toBe(1);
     expect(route.loadComponent).toBeDefined();
     expect(route.children).toBeDefined();
-    expect(route.children!.length).toBe(9);
+    expect(route.children!.length).toBe(12);
   });
 
   it('should define boxes/new child route', () => {
@@ -98,5 +98,28 @@ describe('App Routes', () => {
     const zoneEdit = children[8];
     expect(zoneEdit.path).toBe('zones/:zoneId/edit');
     expect(zoneEdit.loadComponent).toBeDefined();
+  });
+
+  it('should define import child route with showBack data', () => {
+    const children = routes[3].children!;
+    const importRoute = children[9];
+    expect(importRoute.path).toBe('import');
+    expect(importRoute.data).toEqual({ showBack: false });
+    expect(importRoute.loadComponent).toBeDefined();
+  });
+
+  it('should define boxes/:boxId/move-items child route', () => {
+    const children = routes[3].children!;
+    const moveItems = children[10];
+    expect(moveItems.path).toBe('boxes/:boxId/move-items');
+    expect(moveItems.loadComponent).toBeDefined();
+  });
+
+  it('should define logs child route with showBack data', () => {
+    const children = routes[3].children!;
+    const logs = children[11];
+    expect(logs.path).toBe('logs');
+    expect(logs.data).toEqual({ showBack: false });
+    expect(logs.loadComponent).toBeDefined();
   });
 });
