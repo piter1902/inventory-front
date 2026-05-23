@@ -4,6 +4,7 @@ import { BoxesService } from '../../services/boxes.service';
 import { ZonesService } from '../../services/zones.service';
 import { BoxDto } from '../../models/box.models';
 import { PageHeaderService } from '../../layout/page-header/page-header.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-boxes-dashboard',
@@ -14,6 +15,7 @@ import { PageHeaderService } from '../../layout/page-header/page-header.service'
 export class BoxesDashboard implements OnInit {
   private boxesService = inject(BoxesService);
   private zonesService = inject(ZonesService);
+  private notificationService = inject(NotificationService);
   private router = inject(Router);
 
   constructor() {
@@ -23,6 +25,8 @@ export class BoxesDashboard implements OnInit {
   boxes = signal<BoxDto[]>([]);
   zoneMap = signal<Map<string, string>>(new Map());
   searchQuery = signal('');
+  openMenuId = signal<string | null>(null);
+  deletingId = signal<string | null>(null);
 
   get totalBoxes(): number {
     return this.boxes().length;
@@ -60,6 +64,38 @@ export class BoxesDashboard implements OnInit {
 
   onCreateBox(): void {
     this.router.navigate(['/boxes/new']);
+  }
+
+  toggleMenu(event: MouseEvent, id: string): void {
+    event.stopPropagation();
+    this.openMenuId.set(this.openMenuId() === id ? null : id);
+  }
+
+  closeMenu(): void {
+    this.openMenuId.set(null);
+  }
+
+  editBox(id: string): void {
+    this.closeMenu();
+    this.router.navigate(['/boxes', id, 'edit']);
+  }
+
+  deleteBox(event: MouseEvent, id: string, name: string): void {
+    event.stopPropagation();
+    this.closeMenu();
+    if (!window.confirm(`¿Eliminar la caja "${name}"? Esta acción no se puede deshacer.`)) return;
+
+    this.deletingId.set(id);
+    this.boxesService.delete(id).subscribe({
+      next: () => {
+        this.boxes.update(list => list.filter(b => b.id !== id));
+        this.notificationService.show(`Caja "${name}" eliminada`, 'success');
+        this.deletingId.set(null);
+      },
+      error: () => {
+        this.deletingId.set(null);
+      },
+    });
   }
 
   onSearch(event: Event): void {

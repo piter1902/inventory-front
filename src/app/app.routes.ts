@@ -55,6 +55,11 @@ export const routes: Routes = [
         path: 'zones/:zoneId/edit',
         loadComponent: () => import('./features/zones/zone-edit').then(m => m.ZoneEdit),
       },
+      {
+        path: 'import',
+        data: { showBack: false },
+        loadComponent: () => import('./features/import-excel/import-excel').then(m => m.ImportExcel),
+      },
     ],
   },
 ];
