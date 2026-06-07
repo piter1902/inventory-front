@@ -51,3 +51,7 @@ docker compose -f docker-compose.deploy.yml --env-file .env up -d
 | `API_DOCKERFILE` | `Dockerfile` | Backend Dockerfile name |
 
 Auth and API URL are configured in `src/environments/environment.ts` (dev) and `environment.prod.ts` (production).
+
+## License
+
+MIT — see [LICENSE](LICENSE).
