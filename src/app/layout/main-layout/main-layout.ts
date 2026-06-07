@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
 import { BottomNav } from '../bottom-nav/bottom-nav';
@@ -24,6 +25,7 @@ export class MainLayout {
         while (route.firstChild) route = route.firstChild;
         return route.snapshot.data;
       }),
+      takeUntilDestroyed(),
     ).subscribe(data => {
       headerService.setShowBack(data['showBack'] !== false);
     });

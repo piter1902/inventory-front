@@ -12,7 +12,7 @@
           <span class="bg-error-container text-on-error-container px-3 py-1 rounded-full text-label-sm">{{ res.failureCount }} fallos</span>
         }
       </div>
-      @if (res.results?.length) {
+      @if (res.results.length) {
         <div class="space-y-stack-sm">
           @for (r of res.results; track r.itemId) {
             <div

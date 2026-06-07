@@ -13,17 +13,23 @@ export class NotificationService {
   readonly notifications = signal<Notification[]>([]);
 
   private autoRemoveTimeout = 5000;
+  private readonly timeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
   show(message: string, type: NotificationType = 'error'): void {
     const id = crypto.randomUUID();
     this.notifications.update(n => [...n, { id, message, type }]);
 
-    setTimeout(() => {
+    this.timeouts.set(id, setTimeout(() => {
       this.remove(id);
-    }, this.autoRemoveTimeout);
+    }, this.autoRemoveTimeout));
   }
 
   remove(id: string): void {
+    const timeout = this.timeouts.get(id);
+    if (timeout !== undefined) {
+      clearTimeout(timeout);
+      this.timeouts.delete(id);
+    }
     this.notifications.update(n => n.filter(x => x.id !== id));
   }
 }

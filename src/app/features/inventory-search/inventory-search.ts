@@ -1,4 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { BoxesService } from '../../services/boxes.service';
@@ -30,7 +31,8 @@ export class InventorySearch implements OnInit {
     this.searchSubject.pipe(
       debounceTime(300),
       distinctUntilChanged(),
-      switchMap(q => this.boxesService.search(q))
+      switchMap(q => this.boxesService.search(q)),
+      takeUntilDestroyed(),
     ).subscribe(result => {
       this.searchResult.set(result);
       this.hasSearched.set(true);

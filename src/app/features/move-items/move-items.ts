@@ -47,6 +47,10 @@ export class MoveItems implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadData();
+  }
+
+  private loadData(): void {
     this.boxesService.getById(this.boxId()).subscribe(data => {
       this.sourceBox.set(data);
     });
@@ -122,6 +126,6 @@ export class MoveItems implements OnInit {
     this.selectedItemIds.set(new Set());
     this.destinationBoxId.set(null);
     this.result.set(null);
-    this.ngOnInit();
+    this.loadData();
   }
 }

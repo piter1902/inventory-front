@@ -65,7 +65,8 @@ export class BoxDetail implements OnInit {
   private generateQr(): void {
     const url = `${window.location.origin}/boxes/${this.boxId()}`;
     QRCode.toDataURL(url, { width: 300, margin: 2, color: { dark: '#000000', light: '#ffffff' } })
-      .then((dataUrl: string) => this.qrDataUrl.set(dataUrl));
+      .then((dataUrl: string) => this.qrDataUrl.set(dataUrl))
+      .catch((err: unknown) => console.error('Failed to generate QR code', err));
   }
 
   editItem(itemId: string): void {
@@ -95,7 +96,7 @@ export class BoxDetail implements OnInit {
 
   private dataUriToBlob(dataUri: string): Blob {
     const parts = dataUri.split(',');
-    const mime = parts[0].match(/:(.*?);/)![1];
+    const mime = parts[0].match(/:(.*?);/)?.[1] ?? 'application/octet-stream';
     const bytes = atob(parts[1]);
     const arr = new Uint8Array(bytes.length);
     for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);

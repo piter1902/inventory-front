@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { OidcSecurityService, LoginResponse } from 'angular-auth-oidc-client';
+import { OidcSecurityService, LoginResponse, UserDataResult } from 'angular-auth-oidc-client';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -11,7 +11,7 @@ export class AuthService {
     return this.oidcSecurityService.isAuthenticated$.pipe(map(r => r.isAuthenticated));
   }
 
-  get userData$(): Observable<any> {
+  get userData$(): Observable<UserDataResult> {
     return this.oidcSecurityService.userData$;
   }
 
