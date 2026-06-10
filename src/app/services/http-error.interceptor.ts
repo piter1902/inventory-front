@@ -19,9 +19,7 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      const message = errorMessages[error.status]
-        ?? (error.error?.message || error.statusText)
-        ?? 'Ha ocurrido un error inesperado.';
+      const message = errorMessages[error.status] ?? 'Ha ocurrido un error inesperado.';
 
       notificationService.show(message, 'error');
 

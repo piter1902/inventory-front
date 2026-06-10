@@ -15,6 +15,10 @@
       }
     </div>
 
+    @if (validationError()) {
+      <p class="text-label-sm text-label-sm text-error">{{ validationError() }}</p>
+    }
+
     <div class="space-y-stack-sm">
       <label class="text-label-md text-label-md text-on-surface-variant block" for="box-description">Descripción</label>
       <textarea

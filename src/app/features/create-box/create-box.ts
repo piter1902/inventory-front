@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { BoxesService } from '../../services/boxes.service';
-import { CreateBoxCommand } from '../../models/box.models';
+import { CreateBoxCommand, MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '../../models/box.models';
 import { PageHeaderService } from '../../layout/page-header/page-header.service';
 import { ImageService } from '../../services/image.service';
 
@@ -32,6 +32,7 @@ export class CreateBox {
   imageBase64 = signal<string | null>(null);
   saving = signal(false);
   nameError = signal(false);
+  validationError = signal<string | null>(null);
 
   get itemCount(): number {
     return this.items().length;
@@ -40,10 +41,12 @@ export class CreateBox {
   updateName(value: string): void {
     this.name.set(value);
     if (value.trim()) this.nameError.set(false);
+    this.validationError.set(null);
   }
 
   updateDescription(value: string): void {
     this.description.set(value);
+    this.validationError.set(null);
   }
 
   addItem(): void {
@@ -79,14 +82,36 @@ export class CreateBox {
 
   create(): void {
     const trimmedName = this.name().trim();
+    this.validationError.set(null);
+
     if (!trimmedName) {
       this.nameError.set(true);
       return;
     }
+    if (trimmedName.length > MAX_NAME_LENGTH) {
+      this.validationError.set(`El nombre no puede superar los ${MAX_NAME_LENGTH} caracteres.`);
+      return;
+    }
 
-    this.saving.set(true);
+    const trimmedDescription = this.description().trim();
+    if (trimmedDescription.length > MAX_DESCRIPTION_LENGTH) {
+      this.validationError.set(`La descripción no puede superar los ${MAX_DESCRIPTION_LENGTH} caracteres.`);
+      return;
+    }
 
     const nonEmpty = this.items().filter(i => i.name.trim());
+
+    const invalidItem = nonEmpty.find(
+      i => i.name.trim().length > MAX_NAME_LENGTH || i.description.trim().length > MAX_DESCRIPTION_LENGTH
+    );
+    if (invalidItem) {
+      this.validationError.set(
+        `Cada item debe tener como máximo ${MAX_NAME_LENGTH} caracteres en el nombre y ${MAX_DESCRIPTION_LENGTH} en la descripción.`
+      );
+      return;
+    }
+
+    this.saving.set(true);
 
     const command: CreateBoxCommand = {
       name: trimmedName,

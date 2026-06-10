@@ -117,6 +117,10 @@
       </div>
     </section>
 
+    @if (validationError()) {
+      <p class="text-label-sm text-label-sm text-error px-1">{{ validationError() }}</p>
+    }
+
     <!-- Danger Zone -->
     <section class="pt-4 flex flex-col gap-stack-md">
       <button type="button" class="w-full flex items-center justify-between p-4 bg-error-container/10 border border-error/20 rounded-xl text-error hover:bg-error-container/20 transition-colors" (click)="deleteBox()">

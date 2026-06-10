@@ -1,3 +1,7 @@
+export const MAX_NAME_LENGTH = 200;
+export const MAX_DESCRIPTION_LENGTH = 1000;
+export const MAX_IDENTIFIER_LENGTH = 100;
+
 export interface BoxDto {
   id: string;
   identifier: string;

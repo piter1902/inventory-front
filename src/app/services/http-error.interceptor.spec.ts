@@ -61,7 +61,7 @@ describe('httpErrorInterceptor', () => {
     expect(showSpy).toHaveBeenCalledWith(expectedMessage, 'error');
   });
 
-  it('should use error body message for unknown status codes', () => {
+  it('should use a generic message for unknown status codes, ignoring the error body', () => {
     const showSpy = vi.spyOn(notificationService, 'show');
 
     httpClient.get('/api/test').subscribe({
@@ -72,12 +72,12 @@ describe('httpErrorInterceptor', () => {
     req.flush({ message: 'Custom error body' }, { status: 418, statusText: "I'm a teapot" });
 
     expect(showSpy).toHaveBeenCalledWith(
-      'Custom error body',
+      'Ha ocurrido un error inesperado.',
       'error',
     );
   });
 
-  it('should fallback to statusText when no error body message exists', () => {
+  it('should use a generic message for unknown status codes, ignoring statusText', () => {
     const showSpy = vi.spyOn(notificationService, 'show');
 
     httpClient.get('/api/test').subscribe({
@@ -88,7 +88,7 @@ describe('httpErrorInterceptor', () => {
     req.flush(null, { status: 418, statusText: "I'm a teapot" });
 
     expect(showSpy).toHaveBeenCalledWith(
-      "I'm a teapot",
+      'Ha ocurrido un error inesperado.',
       'error',
     );
   });

@@ -32,18 +32,22 @@ export function getInitials(userData: Record<string, any> | undefined): string {
     if (parts.length >= 2) {
       return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
-    return parts[0][0].toUpperCase();
+    if (parts.length === 1) {
+      return parts[0][0].toUpperCase();
+    }
   }
 
   const givenName = userData['given_name'];
   const familyName = userData['family_name'];
   if (givenName || familyName) {
-    return ((givenName?.[0] ?? '') + (familyName?.[0] ?? '')).toUpperCase();
+    const initials = (String(givenName ?? '')[0] ?? '') + (String(familyName ?? '')[0] ?? '');
+    if (initials) return initials.toUpperCase();
   }
 
   const email = userData['email'];
   if (email) {
-    return email[0].toUpperCase();
+    const emailStr = String(email);
+    if (emailStr.length > 0) return emailStr[0].toUpperCase();
   }
 
   return '?';

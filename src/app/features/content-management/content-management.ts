@@ -1,7 +1,7 @@
 import { Component, inject, input, OnInit, signal, viewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { BoxesService } from '../../services/boxes.service';
-import { UpdateItemRequest } from '../../models/box.models';
+import { MAX_DESCRIPTION_LENGTH, MAX_IDENTIFIER_LENGTH, MAX_NAME_LENGTH, UpdateItemRequest } from '../../models/box.models';
 import { PageHeaderService } from '../../layout/page-header/page-header.service';
 import { ImageService } from '../../services/image.service';
 
@@ -35,6 +35,7 @@ export class ContentManagement implements OnInit {
   editingItemId = signal<string | null>(null);
   loading = signal(true);
   saving = signal(false);
+  validationError = signal<string | null>(null);
 
   fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
 
@@ -70,14 +71,17 @@ export class ContentManagement implements OnInit {
 
   updateBoxName(value: string): void {
     this.boxName.set(value);
+    this.validationError.set(null);
   }
 
   updateDescription(value: string): void {
     this.description.set(value);
+    this.validationError.set(null);
   }
 
   updateIdentifier(value: string): void {
     this.identifier.set(value);
+    this.validationError.set(null);
   }
 
   toggleEditItem(id: string): void {
@@ -144,10 +148,41 @@ export class ContentManagement implements OnInit {
   }
 
   save(): void {
+    this.validationError.set(null);
+
+    const trimmedName = this.boxName().trim();
+    if (!trimmedName) {
+      this.validationError.set('El nombre de la caja es obligatorio.');
+      return;
+    }
+    if (trimmedName.length > MAX_NAME_LENGTH) {
+      this.validationError.set(`El nombre no puede superar los ${MAX_NAME_LENGTH} caracteres.`);
+      return;
+    }
+    if (this.description().trim().length > MAX_DESCRIPTION_LENGTH) {
+      this.validationError.set(`La descripción no puede superar los ${MAX_DESCRIPTION_LENGTH} caracteres.`);
+      return;
+    }
+    if (this.identifier().trim().length > MAX_IDENTIFIER_LENGTH) {
+      this.validationError.set(`El identificador no puede superar los ${MAX_IDENTIFIER_LENGTH} caracteres.`);
+      return;
+    }
+
+    const pendingItems = this.editItems().filter(i => !i._isDeleted);
+
+    const invalidItem = pendingItems.find(
+      i => i.name.trim().length > MAX_NAME_LENGTH || i.description.trim().length > MAX_DESCRIPTION_LENGTH
+    );
+    if (invalidItem) {
+      this.validationError.set(
+        `Cada item debe tener como máximo ${MAX_NAME_LENGTH} caracteres en el nombre y ${MAX_DESCRIPTION_LENGTH} en la descripción.`
+      );
+      return;
+    }
+
     this.saving.set(true);
     const boxId = this.boxId();
 
-    const pendingItems = this.editItems().filter(i => !i._isDeleted);
     const items: UpdateItemRequest[] = pendingItems.map(item => ({
       name: item.name,
       description: item.description,
