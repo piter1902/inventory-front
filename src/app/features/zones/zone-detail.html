@@ -11,10 +11,15 @@
           <span class="text-label-md text-label-md text-on-surface-variant">{{ boxes.length }} cajas en esta zona</span>
         </div>
       </div>
-      <button class="bg-secondary text-on-secondary px-5 py-2 rounded-full text-label-md text-label-md shadow-sm flex items-center gap-2 active:scale-95 transition-all hover:brightness-110" (click)="edit()">
-        <span class="material-symbols-outlined text-[20px]">edit</span>
-        Editar Zona
-      </button>
+      <div class="zone-actions">
+        <button class="zone-add text-label-md text-label-md active:scale-95 transition-all hover:brightness-110" (click)="sheetOpen.set(true)">
+          <span class="material-symbols-outlined text-[22px]">add</span>
+          Añadir cajas
+        </button>
+        <button class="zone-edit active:scale-95 transition-all" aria-label="Editar zona" (click)="edit()">
+          <span class="material-symbols-outlined text-[22px]">edit</span>
+        </button>
+      </div>
     </section>
 
     <section class="flex flex-col gap-stack-md">
@@ -22,6 +27,7 @@
       <div class="flex flex-col gap-base">
         @for (box of boxes; track box.id) {
           <a [routerLink]="['/boxes', box.id]"
+             [class.box-fresh]="freshIds().has(box.id)"
              class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-outline-variant/20 flex items-center gap-4 active:scale-[0.98] cursor-pointer transition-all hover:shadow-md">
             <div class="w-14 h-14 rounded-xl bg-surface-container-high flex items-center justify-center shrink-0 text-on-surface-variant overflow-hidden">
               <span class="material-symbols-outlined text-2xl">inventory_2</span>
@@ -35,6 +41,9 @@
                 <p class="text-label-sm text-label-sm text-on-surface-variant mt-1">{{ box.items.length }} items</p>
               }
             </div>
+            @if (freshIds().has(box.id)) {
+              <span class="badge-new">NUEVA</span>
+            }
             <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
           </a>
         } @empty {
@@ -45,5 +54,19 @@
         }
       </div>
     </section>
+
+    @if (sheetOpen()) {
+      <app-add-boxes-sheet
+        [zoneId]="z.id" [zoneName]="z.name" [assignedIds]="boxIds"
+        (closed)="sheetOpen.set(false)" (confirmed)="addBoxes($event)" />
+    }
+
+    @if (undoState(); as u) {
+      <div class="undo-toast" role="status">
+        <span class="material-symbols-outlined">check</span>
+        <span class="undo-text text-label-md text-label-md">{{ u.count === 1 ? '1 caja añadida' : u.count + ' cajas añadidas' }}</span>
+        <button type="button" class="undo-btn text-label-md text-label-md" (click)="undo()">Deshacer</button>
+      </div>
+    }
   }
 </main>

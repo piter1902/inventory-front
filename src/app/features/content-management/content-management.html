@@ -1,147 +1,110 @@
-<main class="px-container-padding-mobile max-w-2xl mx-auto pb-44 flex flex-col gap-stack-lg">
+<main class="bf-page">
   @if (loading()) {
-    <div class="flex justify-center py-12">
-      <span class="material-symbols-outlined text-4xl text-on-surface-variant animate-spin">progress_activity</span>
+    <div style="display:flex;justify-content:center;padding:48px 0">
+      <span class="material-symbols-outlined animate-spin" style="font-size:36px">progress_activity</span>
     </div>
   } @else {
-    <!-- Photo Section -->
-    <section class="relative group">
-      <div class="w-full h-48 rounded-xl overflow-hidden bg-surface-container-high shadow-sm relative">
-        @if (imagePreview()) {
-          <img alt="Foto de la caja" class="w-full h-full object-cover" [src]="imagePreview()"/>
-        } @else {
-          <div class="w-full h-full flex items-center justify-center text-on-surface-variant">
-            <span class="material-symbols-outlined text-6xl">image</span>
+    <div class="bf-head">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <button type="button" class="bf-photo" [class.bf-photo-filled]="imagePreview()" [attr.aria-label]="imagePreview() ? 'Cambiar foto' : 'Añadir foto'" (click)="fileInput.click()">
+          @if (imagePreview()) {
+            <img [src]="imagePreview()!" alt="Foto de la caja"/>
+            <span class="bf-photo-label">Cambiar</span>
+          } @else {
+            <span class="material-symbols-outlined">photo_camera</span>
+            Foto
+          }
+        </button>
+      </div>
+      <input #fileInput type="file" accept="image/*" style="display:none" (change)="onPhotoSelected($event)"/>
+
+      <div class="bf-field">
+        <label class="bf-label" for="box-name">Nombre *</label>
+        <input class="bf-input" id="box-name" type="text" [value]="boxName()" (input)="updateBoxName($any($event.target).value)"/>
+      </div>
+    </div>
+    @if (imagePreview()) {
+      <button type="button" class="bf-photo-remove" (click)="removeImage()">Quitar foto</button>
+    }
+
+    <div class="bf-field">
+      <label class="bf-label" for="box-description">Descripción <span>(opcional)</span></label>
+      <textarea class="bf-textarea" id="box-description" rows="2" [value]="description()"
+                (input)="updateDescription($any($event.target).value)"></textarea>
+    </div>
+
+    <div class="bf-field">
+      <label class="bf-label" for="box-identifier">Identificador</label>
+      <input class="bf-input" id="box-identifier" type="text" [value]="identifier()" (input)="updateIdentifier($any($event.target).value)"/>
+    </div>
+
+    <section class="bf-list">
+      <div class="bf-section-head">
+        <h2>Objetos</h2>
+        <span class="bf-count">{{ itemsCount === 1 ? '1 objeto' : itemsCount + ' objetos' }}</span>
+      </div>
+
+      <div class="bf-quickadd">
+        <input class="bf-input" type="text" aria-label="Nuevo objeto" placeholder="Escribe un objeto y pulsa Enter"
+               [value]="draft()" (input)="draft.set($any($event.target).value)" (keydown.enter)="addDraft(); $event.preventDefault()"/>
+        <button type="button" class="bf-add" aria-label="Añadir objeto" [disabled]="!draft().trim()" (click)="addDraft()">
+          <span class="material-symbols-outlined">add</span>
+        </button>
+      </div>
+
+      @for (item of editItems(); track item.id) {
+        @if (!item._isDeleted) {
+          <div class="bf-item">
+            <div class="bf-item-body">
+              @if (editingItemId() === item.id) {
+                <input class="bf-input" type="text" aria-label="Nombre del objeto" [value]="item.name" placeholder="Nombre del objeto"
+                       (input)="updateItemName(item.id, $any($event.target).value)"/>
+                <input class="bf-input" type="text" aria-label="Descripción del objeto" [value]="item.description" placeholder="Descripción"
+                       (input)="updateItemDescription(item.id, $any($event.target).value)"/>
+                <button type="button" class="bf-item-link" (click)="toggleEditItem(item.id)">Listo</button>
+              } @else {
+                <span class="bf-item-name">{{ item.name || 'Sin nombre' }}</span>
+                @if (item.description) {
+                  <button type="button" class="bf-item-desc" (click)="toggleEditItem(item.id)">{{ item.description }}</button>
+                } @else {
+                  <button type="button" class="bf-item-link" (click)="toggleEditItem(item.id)">+ Añadir descripción</button>
+                }
+              }
+            </div>
+            <button type="button" class="bf-icon-btn" aria-label="Quitar objeto" (click)="removeItem(item.id)">
+              <span class="material-symbols-outlined">close</span>
+            </button>
           </div>
         }
-        <div class="absolute inset-0 bg-primary/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" (click)="fileInput.click()">
-          <button type="button" class="bg-surface-container-lowest text-primary px-4 py-2 rounded-full text-label-md text-label-md flex items-center gap-2 shadow-lg">
-            <span class="material-symbols-outlined text-[20px]">photo_camera</span>
-            Cambiar Foto
-          </button>
-        </div>
-      </div>
-      <input #fileInput type="file" accept="image/*" class="hidden" (change)="onPhotoSelected($event)"/>
-      <button type="button" class="absolute bottom-4 right-4 w-12 h-12 bg-secondary text-on-secondary rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform" (click)="fileInput.click()">
-        <span class="material-symbols-outlined">edit</span>
-      </button>
-      @if (imagePreview()) {
-        <button type="button" class="mt-2 w-full flex items-center justify-center gap-2 py-2 rounded-xl text-error hover:bg-error-container/10 transition-colors active:scale-[0.99]" (click)="removeImage()">
-          <span class="material-symbols-outlined text-[20px]">delete</span>
-          <span class="text-label-md text-label-md">Quitar imagen</span>
-        </button>
+      } @empty {
+        <div class="bf-empty"><strong>Esta caja no tiene objetos</strong><span>Añade el primero arriba.</span></div>
       }
     </section>
 
-    <!-- Form Fields -->
-    <section class="flex flex-col gap-stack-md">
-      <div class="flex flex-col gap-base">
-        <label class="text-label-md text-label-md text-on-surface-variant px-1">Nombre de la caja</label>
-        <input
-          class="w-full bg-surface-container border-none rounded-lg h-14 px-4 text-body-md text-body-md focus:ring-2 focus:ring-primary text-primary outline-none"
-          type="text"
-          [value]="boxName()"
-          (input)="updateBoxName($any($event.target).value)"/>
-      </div>
-      <div class="flex flex-col gap-base">
-        <label class="text-label-md text-label-md text-on-surface-variant px-1">Descripción</label>
-        <textarea
-          class="w-full h-24 bg-surface-container border-none rounded-lg px-4 py-3 text-body-md text-body-md focus:ring-2 focus:ring-primary text-primary outline-none resize-none"
-          [value]="description()"
-          (input)="updateDescription($any($event.target).value)"></textarea>
-      </div>
-      <div class="flex flex-col gap-base">
-        <label class="text-label-md text-label-md text-on-surface-variant px-1">Identificador</label>
-        <div class="relative">
-          <input
-            class="w-full bg-surface-container border-none rounded-lg h-14 px-4 text-body-md text-body-md focus:ring-2 focus:ring-primary text-primary outline-none"
-            type="text"
-            [value]="identifier()"
-            (input)="updateIdentifier($any($event.target).value)"/>
-          <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline">qr_code_2</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Items Section -->
-    <section class="flex flex-col gap-stack-md">
-      <div class="flex items-center justify-between">
-        <h2 class="text-headline-md text-headline-md text-primary">Contenido de la caja</h2>
-        <span class="text-label-sm text-label-sm bg-primary-container text-on-primary-container px-3 py-1 rounded-full">{{ itemsCount }} Items</span>
-      </div>
-      <div class="flex flex-col gap-base">
-        @for (item of editItems(); track item.id) {
-          @if (!item._isDeleted) {
-            <div class="flex items-center gap-4 p-4 bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30">
-              <div class="w-12 h-12 rounded-lg bg-surface-container-high flex-shrink-0 overflow-hidden flex items-center justify-center text-on-surface-variant">
-                <span class="material-symbols-outlined">inventory_2</span>
-              </div>
-              @if (editingItemId() === item.id) {
-                <div class="flex-grow flex flex-col gap-1">
-                  <input
-                    class="bg-surface-container rounded-lg px-3 py-2 text-label-md text-label-md text-primary outline-none focus:ring-2 focus:ring-primary"
-                    type="text"
-                    [value]="item.name"
-                    (input)="updateItemName(item.id, $any($event.target).value)"/>
-                  <input
-                    class="bg-surface-container rounded-lg px-3 py-2 text-label-sm text-label-sm text-on-surface-variant outline-none focus:ring-2 focus:ring-primary"
-                    type="text"
-                    [value]="item.description"
-                    (input)="updateItemDescription(item.id, $any($event.target).value)"/>
-                </div>
-              } @else {
-                <div class="flex-grow">
-                  <h3 class="text-label-md text-label-md text-primary">{{ item.name }}</h3>
-                  @if (item.description) {
-                    <p class="text-label-sm text-label-sm text-on-surface-variant">{{ item.description }}</p>
-                  }
-                </div>
-              }
-              <div class="flex gap-2">
-                <button type="button" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-high text-primary active:scale-90" (click)="toggleEditItem(item.id)">
-                  <span class="material-symbols-outlined text-[20px]">edit</span>
-                </button>
-                <button type="button" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error active:scale-90" (click)="removeItem(item.id)">
-                  <span class="material-symbols-outlined text-[20px]">delete</span>
-                </button>
-              </div>
-            </div>
-          }
-        }
-
-        <!-- Add New Item Button -->
-        <button type="button" class="w-full py-4 border-2 border-dashed border-outline-variant rounded-xl flex items-center justify-center gap-2 text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-[0.98]" (click)="addItem()">
-          <span class="material-symbols-outlined">add_circle</span>
-          <span class="text-label-md text-label-md">Añadir nuevo item</span>
-        </button>
-      </div>
-    </section>
-
     @if (validationError()) {
-      <p class="text-label-sm text-label-sm text-error px-1">{{ validationError() }}</p>
+      <p class="bf-error"><span class="material-symbols-outlined">error</span>{{ validationError() }}</p>
     }
 
-    <!-- Danger Zone -->
-    <section class="pt-4 flex flex-col gap-stack-md">
-      <button type="button" class="w-full flex items-center justify-between p-4 bg-error-container/10 border border-error/20 rounded-xl text-error hover:bg-error-container/20 transition-colors" (click)="deleteBox()">
-        <div class="flex items-center gap-3">
-          <span class="material-symbols-outlined">delete_forever</span>
-          <span class="text-label-md text-label-md">Eliminar esta caja</span>
-        </div>
-        <span class="material-symbols-outlined">chevron_right</span>
-      </button>
-      <button
-        class="bg-secondary text-on-secondary px-5 py-2 rounded-full text-label-md text-label-md shadow-sm flex items-center justify-center gap-2 active:scale-95 transition-all hover:brightness-110"
-        [class.opacity-60]="saving()"
-        [disabled]="saving()"
-        (click)="save()">
-        @if (saving()) {
-          Guardando...
-        } @else {
-          <span class="material-symbols-outlined text-[20px]">save</span>
-          Guardar Cambios
-        }
-      </button>
-    </section>
+    <button type="button" class="bf-danger" (click)="deleteBox()">
+      <span class="material-symbols-outlined">delete</span>Eliminar caja
+    </button>
   }
 </main>
+
+@if (undoId()) {
+  <div class="bf-toast" role="status">
+    <span>Objeto quitado</span>
+    <button type="button" (click)="undoRemove()">Deshacer</button>
+  </div>
+}
+
+@if (!loading()) {
+  <div class="bf-footer">
+    <div class="bf-footer-inner">
+      <button type="button" class="bf-cancel" (click)="cancel()">Cancelar</button>
+      <button type="button" class="bf-cta" [disabled]="saving() || !boxName().trim()" (click)="save()">
+        @if (saving()) { Guardando... } @else { Guardar cambios }
+      </button>
+    </div>
+  </div>
+}

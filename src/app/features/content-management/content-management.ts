@@ -17,7 +17,7 @@ interface EditableItem {
   selector: 'app-content-management',
   imports: [],
   templateUrl: './content-management.html',
-  styleUrl: './content-management.scss',
+  styleUrls: ['../../shared/box-form/box-form.scss', './content-management.scss'],
 })
 export class ContentManagement implements OnInit {
   private boxesService = inject(BoxesService);
@@ -34,6 +34,9 @@ export class ContentManagement implements OnInit {
   editItems = signal<EditableItem[]>([]);
   editingItemId = signal<string | null>(null);
   loading = signal(true);
+  draft = signal('');
+  undoId = signal<string | null>(null);
+  private undoTimeout?: ReturnType<typeof setTimeout>;
   saving = signal(false);
   validationError = signal<string | null>(null);
 
@@ -100,6 +103,28 @@ export class ContentManagement implements OnInit {
     );
   }
 
+  addDraft(): void {
+    const name = this.draft().trim();
+    if (!name) return;
+    this.editItems.update(items => [
+      { id: 'new_' + crypto.randomUUID(), name, description: '', _isNew: true, _isDeleted: false },
+      ...items,
+    ]);
+    this.draft.set('');
+  }
+
+  undoRemove(): void {
+    const id = this.undoId();
+    if (!id) return;
+    clearTimeout(this.undoTimeout);
+    this.editItems.update(items => items.map(i => (i.id === id ? { ...i, _isDeleted: false } : i)));
+    this.undoId.set(null);
+  }
+
+  cancel(): void {
+    this.router.navigate(['/boxes', this.boxId()]);
+  }
+
   addItem(): void {
     const tempId = 'new_' + Date.now();
     this.editItems.update(items => [
@@ -116,6 +141,9 @@ export class ContentManagement implements OnInit {
     if (this.editingItemId() === id) {
       this.editingItemId.set(null);
     }
+    clearTimeout(this.undoTimeout);
+    this.undoId.set(id);
+    this.undoTimeout = setTimeout(() => this.undoId.set(null), 6000);
   }
 
   async onPhotoSelected(event: Event): Promise<void> {

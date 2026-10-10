@@ -1,0 +1,74 @@
+<div class="sheet-root">
+  <button type="button" class="sheet-backdrop" aria-label="Cerrar" (click)="closed.emit()"></button>
+
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="add-boxes-title">
+    <div class="sheet-handle"><span></span></div>
+
+    <div class="sheet-header">
+      <div class="sheet-title">
+        <h2 id="add-boxes-title" class="text-headline-md text-headline-md">Añadir cajas</h2>
+        <p class="text-label-sm text-label-sm sheet-sub">a {{ zoneName() }}</p>
+      </div>
+      <button type="button" class="icon-btn" aria-label="Cerrar" (click)="closed.emit()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="sheet-search">
+      <label>
+        <span class="material-symbols-outlined">search</span>
+        <input type="text" placeholder="Buscar por nombre o código" aria-label="Buscar cajas"
+               (input)="query.set($any($event.target).value)"/>
+      </label>
+    </div>
+
+    <div class="sheet-filters">
+      @for (f of filters; track f.id) {
+        <button type="button" class="pill" [class.pill-on]="filter() === f.id" (click)="filter.set(f.id)">{{ f.label }}</button>
+      }
+    </div>
+
+    <div class="sheet-list">
+      @for (box of candidates(); track box.id) {
+        <button type="button" class="row" [class.row-on]="selected().has(box.id)"
+                [attr.aria-pressed]="selected().has(box.id)" (click)="toggle(box.id)">
+          <span class="row-thumb">
+            <app-box-image [boxId]="box.id" [hasImage]="box.hasImage" [alt]="box.name" [iconSize]="22" />
+          </span>
+          <span class="row-text">
+            <span class="row-name text-label-md text-label-md">{{ box.name }}</span>
+            <span class="row-meta text-label-sm text-label-sm" [class.row-meta-warn]="box.zoneId">
+              @if (box.identifier) { {{ box.identifier }} · }
+              @if (box.zoneId) { Ahora en {{ box.zoneName || 'otra zona' }} } @else { Sin zona }
+            </span>
+          </span>
+          <span class="check" [class.check-on]="selected().has(box.id)">
+            @if (selected().has(box.id)) {
+              <span class="material-symbols-outlined">check</span>
+            }
+          </span>
+        </button>
+      } @empty {
+        <div class="sheet-empty">
+          <span class="material-symbols-outlined">inventory_2</span>
+          <p class="text-body-md text-body-md">
+            @if (loading()) { Cargando cajas... } @else { No hay cajas que coincidan }
+          </p>
+        </div>
+      }
+    </div>
+
+    <div class="sheet-footer">
+      <button type="button" class="cta" [disabled]="selected().size === 0" (click)="confirm()">
+        @if (selected().size === 0) { Selecciona cajas }
+        @else if (selected().size === 1) { Añadir 1 caja }
+        @else { Añadir {{ selected().size }} cajas }
+      </button>
+      @if (movingCount() > 0) {
+        <p class="move-note text-label-sm text-label-sm">
+          {{ movingCount() === 1 ? '1 caja se moverá desde otra zona' : movingCount() + ' cajas se moverán desde otra zona' }}
+        </p>
+      }
+    </div>
+  </div>
+</div>

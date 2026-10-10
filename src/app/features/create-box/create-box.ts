@@ -15,7 +15,7 @@ interface PendingItem {
   selector: 'app-create-box',
   imports: [],
   templateUrl: './create-box.html',
-  styleUrl: './create-box.scss',
+  styleUrls: ['../../shared/box-form/box-form.scss', './create-box.scss'],
 })
 export class CreateBox {
   private boxesService = inject(BoxesService);
@@ -33,6 +33,10 @@ export class CreateBox {
   saving = signal(false);
   nameError = signal(false);
   validationError = signal<string | null>(null);
+  draft = signal('');
+  editingItemId = signal<string | null>(null);
+  undoItem = signal<{ item: PendingItem; index: number } | null>(null);
+  private undoTimeout?: ReturnType<typeof setTimeout>;
 
   get itemCount(): number {
     return this.items().length;
@@ -56,6 +60,25 @@ export class CreateBox {
     ]);
   }
 
+  addDraft(): void {
+    const name = this.draft().trim();
+    if (!name) return;
+    this.items.update(list => [{ id: crypto.randomUUID(), name, description: '' }, ...list]);
+    this.draft.set('');
+  }
+
+  undoRemove(): void {
+    const undo = this.undoItem();
+    if (!undo) return;
+    clearTimeout(this.undoTimeout);
+    this.items.update(list => {
+      const next = [...list];
+      next.splice(Math.min(undo.index, next.length), 0, undo.item);
+      return next;
+    });
+    this.undoItem.set(null);
+  }
+
   updateItemName(id: string, value: string): void {
     this.items.update(list =>
       list.map(i => (i.id === id ? { ...i, name: value } : i))
@@ -69,7 +92,14 @@ export class CreateBox {
   }
 
   removeItem(id: string): void {
+    const index = this.items().findIndex(i => i.id === id);
+    const item = this.items()[index];
     this.items.update(list => list.filter(i => i.id !== id));
+    if (item && item.name.trim()) {
+      clearTimeout(this.undoTimeout);
+      this.undoItem.set({ item, index });
+      this.undoTimeout = setTimeout(() => this.undoItem.set(null), 6000);
+    }
   }
 
   async onPhotoSelected(event: Event): Promise<void> {
