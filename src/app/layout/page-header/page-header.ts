@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { UserAvatar } from '../../shared/user-avatar/user-avatar';
+import { TopNav } from '../top-nav/top-nav';
 import { PageHeaderService } from './page-header.service';
 import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-page-header',
-  imports: [UserAvatar],
+  imports: [UserAvatar, TopNav],
   template: `
     <header
       class="w-full top-0 z-40 bg-surface shadow-sm flex items-center gap-3 px-container-padding-mobile md:px-container-padding-desktop h-16"
@@ -20,9 +21,10 @@ import { ThemeService } from '../../services/theme.service';
         </button>
       }
       <app-user-avatar />
-      <h1 class="text-headline-lg-mobile md:text-headline-md text-primary font-headline-md flex-1">
+      <h1 class="page-title-mobile text-headline-lg-mobile text-primary font-headline-md flex-1">
         {{ title() }}
       </h1>
+      <app-top-nav class="flex-1" />
       <button
         class="active:scale-95 transition-transform hover:bg-surface-container-high p-2 rounded-full"
         (click)="themeService.toggle()"
@@ -33,7 +35,13 @@ import { ThemeService } from '../../services/theme.service';
       </button>
     </header>
   `,
-  styles: '',
+  styles: `
+    @media (min-width: 768px) {
+      .page-title-mobile {
+        display: none;
+      }
+    }
+  `,
 })
 export class PageHeader {
   private readonly headerService = inject(PageHeaderService);

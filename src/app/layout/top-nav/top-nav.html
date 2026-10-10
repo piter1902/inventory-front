@@ -1,0 +1,11 @@
+<nav class="top-nav" aria-label="Principal">
+  @for (item of items; track item.route) {
+    <a class="top-nav-link"
+       [routerLink]="item.route"
+       routerLinkActive="top-nav-link-active"
+       ariaCurrentWhenActive="page">
+      <span class="material-symbols-outlined">{{ item.icon }}</span>
+      <span class="text-label-md">{{ item.label }}</span>
+    </a>
+  }
+</nav>

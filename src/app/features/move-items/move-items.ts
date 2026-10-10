@@ -4,7 +4,7 @@ import { BoxesService } from '../../services/boxes.service';
 import { ItemsService } from '../../services/items.service';
 import { PageHeaderService } from '../../layout/page-header/page-header.service';
 import { NotificationService } from '../../services/notification.service';
-import { BoxDto, MoveItemsResult } from '../../models/box.models';
+import { BoxDto, BoxSummary, MoveItemsResult } from '../../models/box.models';
 
 @Component({
   selector: 'app-move-items',
@@ -25,7 +25,7 @@ export class MoveItems implements OnInit {
   }
 
   sourceBox = signal<BoxDto | null>(null);
-  allBoxes = signal<BoxDto[]>([]);
+  allBoxes = signal<BoxSummary[]>([]);
   selectedItemIds = signal<Set<string>>(new Set());
   destinationBoxId = signal<string | null>(null);
   destinationSearch = signal('');
@@ -33,13 +33,13 @@ export class MoveItems implements OnInit {
   moving = signal(false);
   result = signal<MoveItemsResult | null>(null);
 
-  get destinationBox(): BoxDto | null {
+  get destinationBox(): BoxSummary | null {
     const id = this.destinationBoxId();
     if (!id) return null;
     return this.allBoxes().find(b => b.id === id) ?? null;
   }
 
-  get filteredDestinationBoxes(): BoxDto[] {
+  get filteredDestinationBoxes(): BoxSummary[] {
     const q = this.destinationSearch().toLowerCase().trim();
     const boxes = this.allBoxes().filter(b => b.id !== this.boxId());
     if (!q) return boxes;

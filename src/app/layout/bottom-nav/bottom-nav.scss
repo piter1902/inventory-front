@@ -2,14 +2,6 @@
   display: block;
 }
 
-.desktop-only {
-  display: none;
-}
-
-.mobile-only {
-  display: flex;
-}
-
 .drawer-backdrop {
   background-color: rgba(0, 0, 0, 0.4);
 }
@@ -45,16 +37,7 @@
 }
 
 @media (min-width: 768px) {
-  .desktop-only {
-    display: flex;
-  }
-
-  .mobile-only {
-    display: none;
-  }
-
-  .drawer-backdrop,
-  .drawer-panel {
+  :host {
     display: none;
   }
 }

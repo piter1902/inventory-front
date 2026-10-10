@@ -2,13 +2,15 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { BoxesService } from '../../services/boxes.service';
 import { ZonesService } from '../../services/zones.service';
-import { BoxDto } from '../../models/box.models';
+import { BoxSummary } from '../../models/box.models';
 import { PageHeaderService } from '../../layout/page-header/page-header.service';
+import { BoxImage } from '../../shared/box-image/box-image';
+import { CreateButton } from '../../shared/create-button/create-button';
 import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-boxes-dashboard',
-  imports: [RouterLink],
+  imports: [RouterLink, CreateButton, BoxImage],
   templateUrl: './boxes-dashboard.html',
   styleUrl: './boxes-dashboard.scss',
 })
@@ -22,7 +24,7 @@ export class BoxesDashboard implements OnInit {
     inject(PageHeaderService).setTitle('Home Inventory');
   }
 
-  boxes = signal<BoxDto[]>([]);
+  boxes = signal<BoxSummary[]>([]);
   zoneMap = signal<Map<string, string>>(new Map());
   searchQuery = signal('');
   openMenuId = signal<string | null>(null);
@@ -36,7 +38,7 @@ export class BoxesDashboard implements OnInit {
     return this.boxes().reduce((sum, b) => sum + (b.items?.length ?? 0), 0);
   }
 
-  get filteredBoxes(): BoxDto[] {
+  get filteredBoxes(): BoxSummary[] {
     const q = this.searchQuery().toLowerCase().trim();
     if (!q) return this.boxes();
     return this.boxes().filter(b =>

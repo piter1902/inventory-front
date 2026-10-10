@@ -3,7 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideHttpClient } from '@angular/common/http';
 import { BoxesService } from './boxes.service';
 import { environment } from '../../environments/environment';
-import { BoxDto, CreateBoxCommand, SearchResultDto, UpdateBoxRequest } from '../models/box.models';
+import { BoxDto, BoxSummary, CreateBoxCommand, SearchResultDto, UpdateBoxRequest } from '../models/box.models';
 
 describe('BoxesService', () => {
   let service: BoxesService;
@@ -26,8 +26,8 @@ describe('BoxesService', () => {
   });
 
   it('should make GET request for getAll()', () => {
-    const mockBoxes: BoxDto[] = [
-      { id: '1', identifier: 'B1', name: 'Box 1', qrUrl: '', items: [] },
+    const mockBoxes: BoxSummary[] = [
+      { id: '1', identifier: 'B1', name: 'Box 1', qrUrl: '', hasImage: true, items: [] },
     ];
 
     service.getAll().subscribe(boxes => {

@@ -5,14 +5,14 @@ import { ZonesService } from '../../services/zones.service';
 import { PageHeaderService } from '../../layout/page-header/page-header.service';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
-import { BoxDto } from '../../models/box.models';
+import { BoxSummary } from '../../models/box.models';
 import { NotificationService } from '../../services/notification.service';
 
 describe('BoxesDashboard', () => {
-  const mockBoxes: BoxDto[] = [
-    { id: '1', identifier: 'BOX-001', name: 'Tools', qrUrl: '', imageBase64: '', items: [{ id: 'i1', name: 'Hammer', description: 'A hammer' }] },
-    { id: '2', identifier: 'BOX-002', name: 'Books', qrUrl: '', items: [] },
-    { id: '3', identifier: 'BOX-003', name: 'Toolshed', qrUrl: '', items: [{ id: 'i2', name: 'Shovel', description: '' }, { id: 'i3', name: 'Rake', description: '' }] },
+  const mockBoxes: BoxSummary[] = [
+    { id: '1', identifier: 'BOX-001', name: 'Tools', qrUrl: '', hasImage: false, items: [{ id: 'i1', name: 'Hammer', description: 'A hammer' }] },
+    { id: '2', identifier: 'BOX-002', name: 'Books', qrUrl: '', hasImage: false, items: [] },
+    { id: '3', identifier: 'BOX-003', name: 'Toolshed', qrUrl: '', hasImage: false, items: [{ id: 'i2', name: 'Shovel', description: '' }, { id: 'i3', name: 'Rake', description: '' }] },
   ];
 
   let fixture: any;

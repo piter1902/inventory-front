@@ -2,11 +2,12 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ZonesService } from '../../services/zones.service';
 import { ZoneDto } from '../../models/zone.models';
+import { CreateButton } from '../../shared/create-button/create-button';
 import { PageHeaderService } from '../../layout/page-header/page-header.service';
 
 @Component({
   selector: 'app-zones-list',
-  imports: [],
+  imports: [CreateButton],
   templateUrl: './zones-list.html',
 })
 export class ZonesList implements OnInit {

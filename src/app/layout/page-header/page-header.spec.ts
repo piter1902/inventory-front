@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
+import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { PageHeader } from './page-header';
 import { PageHeaderService } from './page-header.service';
@@ -32,6 +33,7 @@ describe('PageHeader', () => {
     await TestBed.configureTestingModule({
       imports: [PageHeader],
       providers: [
+        provideRouter([]),
         { provide: PageHeaderService, useValue: mockHeaderService },
         { provide: ThemeService, useValue: mockThemeService },
         { provide: AuthService, useValue: mockAuthService },

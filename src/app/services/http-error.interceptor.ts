@@ -1,7 +1,10 @@
-import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { HttpContextToken, HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { NotificationService } from './notification.service';
+
+/** Set to true on requests whose failure must not raise a notification. */
+export const SKIP_ERROR_NOTIFICATION = new HttpContextToken<boolean>(() => false);
 
 const errorMessages: Record<number, string> = {
   400: 'Solicitud inválida. Revisa los datos e inténtalo de nuevo.',
@@ -19,6 +22,10 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      if (req.context.get(SKIP_ERROR_NOTIFICATION)) {
+        return throwError(() => error);
+      }
+
       const message = errorMessages[error.status] ?? 'Ha ocurrido un error inesperado.';
 
       notificationService.show(message, 'error');

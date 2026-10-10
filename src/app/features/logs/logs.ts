@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { BoxesService } from '../../services/boxes.service';
 import { PageHeaderService } from '../../layout/page-header/page-header.service';
-import { BoxDto, BoxLogEntry } from '../../models/box.models';
+import { BoxSummary, BoxLogEntry } from '../../models/box.models';
 
 @Component({
   selector: 'app-logs',
@@ -18,7 +18,7 @@ export class Logs implements OnInit {
   }
 
   logs = signal<BoxLogEntry[]>([]);
-  allBoxes = signal<BoxDto[]>([]);
+  allBoxes = signal<BoxSummary[]>([]);
   filterBoxId = signal<string | null>(null);
   loading = signal(true);
 

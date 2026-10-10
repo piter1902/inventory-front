@@ -1,0 +1,55 @@
+.create-button {
+  position: fixed;
+  right: 24px;
+  bottom: 96px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 1rem;
+  background-color: var(--color-secondary);
+  color: var(--color-on-secondary);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: transform 150ms ease;
+
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+.create-button-icon {
+  font-size: 32px;
+}
+
+.create-button-label {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .create-button {
+    position: static;
+    width: auto;
+    height: 48px;
+    gap: 8px;
+    padding: 0 20px;
+    border-radius: 0.75rem;
+    box-shadow: none;
+    white-space: nowrap;
+
+    &:hover {
+      filter: brightness(1.1);
+    }
+  }
+
+  .create-button-icon {
+    font-size: 20px;
+  }
+
+  .create-button-label {
+    display: inline;
+    font-size: 14px;
+    font-weight: 600;
+  }
+}

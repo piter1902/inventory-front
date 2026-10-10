@@ -2,13 +2,14 @@ import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ZonesService } from '../../services/zones.service';
 import { BoxesService } from '../../services/boxes.service';
-import { BoxDto } from '../../models/box.models';
+import { BoxImage } from '../../shared/box-image/box-image';
+import { BoxSummary } from '../../models/box.models';
 import { CreateZoneCommand, UpdateZoneCommand } from '../../models/zone.models';
 import { PageHeaderService } from '../../layout/page-header/page-header.service';
 
 @Component({
   selector: 'app-zone-edit',
-  imports: [],
+  imports: [BoxImage],
   templateUrl: './zone-edit.html',
 })
 export class ZoneEdit implements OnInit {
@@ -24,7 +25,7 @@ export class ZoneEdit implements OnInit {
   saving = signal(false);
   nameError = signal(false);
 
-  allBoxes = signal<BoxDto[]>([]);
+  allBoxes = signal<BoxSummary[]>([]);
   selectedBoxIds = signal<Set<string>>(new Set());
   searchQuery = signal('');
 
@@ -46,12 +47,12 @@ export class ZoneEdit implements OnInit {
     }
   }
 
-  get selectedBoxes(): BoxDto[] {
+  get selectedBoxes(): BoxSummary[] {
     const ids = this.selectedBoxIds();
     return this.allBoxes().filter(b => ids.has(b.id));
   }
 
-  get availableBoxes(): BoxDto[] {
+  get availableBoxes(): BoxSummary[] {
     const ids = this.selectedBoxIds();
     const q = this.searchQuery().toLowerCase().trim();
     return this.allBoxes().filter(b => {

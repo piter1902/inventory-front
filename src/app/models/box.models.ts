@@ -13,6 +13,19 @@ export interface BoxDto {
   items: ItemDto[];
 }
 
+/** Element of the `GET /api/boxes` listing. The image is fetched apart via `hasImage`. */
+export interface BoxSummary {
+  id: string;
+  identifier: string;
+  name: string;
+  description?: string;
+  qrUrl: string;
+  hasImage: boolean;
+  zoneId?: string;
+  zoneName?: string;
+  items: ItemDto[];
+}
+
 export interface ItemDto {
   id: string;
   name: string;
