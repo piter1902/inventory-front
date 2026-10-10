@@ -1,118 +1,142 @@
-<main class="px-container-padding-mobile max-w-4xl mx-auto space-y-stack-md pb-32">
-  <div class="space-y-stack-sm">
+<main class="pt-stack-lg px-container-padding-mobile md:px-container-padding-desktop max-w-5xl mx-auto space-y-stack-lg pb-32">
+  <div class="space-y-stack-md max-w-3xl">
     <div class="relative flex items-center">
-      <span class="material-symbols-outlined absolute left-4 text-on-surface-variant">search</span>
+      <span class="material-symbols-outlined absolute left-4 text-primary" aria-hidden="true">search</span>
       <input
-        class="w-full pl-12 pr-12 py-3 bg-surface-container rounded-lg focus:ring-2 focus:outline-none text-body-md text-on-surface placeholder:text-on-surface-variant/60"
-        placeholder="¿Qué estás buscando?"
+        class="w-full h-13 pl-12 pr-12 bg-surface-container-lowest border border-outline-variant rounded-2xl focus:border-2 focus:border-secondary focus:outline-none text-body-md text-on-surface placeholder:text-on-surface-variant/60"
+        placeholder="Item, caja o zona"
+        aria-label="Buscar"
         type="text"
         (input)="onSearch($event)"
         [value]="searchQuery()"/>
       @if (searchQuery()) {
-        <button class="material-symbols-outlined absolute right-4 text-on-surface-variant hover:text-primary transition-colors" (click)="clearSearch()">close</button>
-      }
-    </div>
-
-    <div class="flex gap-2 overflow-x-auto py-2" style="scrollbar-width: none; -ms-overflow-style: none;">
-      @for (filter of filters; track filter) {
         <button
-          class="whitespace-nowrap px-4 py-1-half rounded-full text-label-md text-label-md"
-          [class.bg-primary]="filter === activeFilter()"
-          [class.text-on-primary]="filter === activeFilter()"
-          [class.bg-surface-container-high]="filter !== activeFilter()"
-          [class.text-on-surface-variant]="filter !== activeFilter()"
-          (click)="setFilter(filter)">
-          {{ filter }}
+          class="absolute right-1 w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors"
+          aria-label="Borrar búsqueda"
+          (click)="clearSearch()">
+          <span class="material-symbols-outlined" aria-hidden="true">close</span>
         </button>
       }
     </div>
+
+    @if (hasSearched()) {
+      <div class="flex gap-2 overflow-x-auto" style="scrollbar-width: none; -ms-overflow-style: none;">
+        @for (filter of filters; track filter) {
+          <button
+            class="whitespace-nowrap h-9 px-4 rounded-full text-label-md flex items-center gap-1.5 border"
+            [class.bg-primary]="filter === activeFilter()"
+            [class.text-on-primary]="filter === activeFilter()"
+            [class.border-transparent]="filter === activeFilter()"
+            [class.bg-surface-container-lowest]="filter !== activeFilter()"
+            [class.text-on-surface-variant]="filter !== activeFilter()"
+            [class.border-outline-variant]="filter !== activeFilter()"
+            (click)="setFilter(filter)">
+            {{ filter }}
+            <span class="opacity-70 font-medium">{{ countFor(filter) }}</span>
+          </button>
+        }
+      </div>
+    }
   </div>
 
   @if (hasSearched()) {
-    <section class="space-y-stack-sm">
-      <div class="flex justify-between items-center">
-        <h2 class="text-headline-md text-headline-md text-on-surface">Cajas ({{ filteredBoxes.length }})</h2>
-      </div>
-      @if (filteredBoxes.length > 0) {
-        <div class="flex gap-4 overflow-x-auto pb-2" style="scrollbar-width: none; -ms-overflow-style: none;">
-          @for (box of filteredBoxes; track box.id) {
-            <div class="min-w-[240px] flex gap-3 p-3 bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30 active:scale-95 transition-transform cursor-pointer" (click)="openBox(box.id!)">
-              <div class="w-16 h-16 rounded-lg bg-surface-container flex items-center justify-center overflow-hidden text-on-surface-variant">
-                <app-box-image [boxId]="box.id!" [hasImage]="!!box.hasImage" [alt]="box.name ?? ''" [iconSize]="24" />
-              </div>
-              <div class="flex flex-col justify-center overflow-hidden">
-                <p class="text-label-md text-label-md text-on-surface truncate">{{ box.name }}</p>
-                @if (box.description) {
-                  <p class="text-label-sm text-label-sm text-on-surface-variant truncate">{{ box.description }}</p>
-                }
-                @if (box.zoneName) {
-                  <div class="flex items-center gap-1 mt-1">
-                    <span class="material-symbols-outlined text-[12px] text-secondary">shelves</span>
-                    <span class="text-label-sm text-label-sm text-secondary truncate">{{ box.zoneName }}</span>
-                  </div>
-                }
-              </div>
-            </div>
-          }
+    @if (countFor(activeFilter()) === 0) {
+      <section class="py-12 text-center space-y-4 max-w-md mx-auto">
+        <div class="w-18 h-18 bg-surface-container-high rounded-full flex items-center justify-center mx-auto">
+          <span class="material-symbols-outlined text-[32px] text-on-surface-variant" aria-hidden="true">search_off</span>
         </div>
-      } @else {
-        <p class="text-body-md text-body-md text-on-surface-variant text-center py-4">No se encontraron cajas</p>
-      }
-    </section>
-
-    <section class="space-y-stack-sm pt-4">
-      <div class="flex justify-between items-center">
-        <h2 class="text-headline-md text-headline-md text-on-surface">Items ({{ allItems.length }})</h2>
-      </div>
-      @if (allItems.length > 0) {
-        <div class="grid gap-gutter">
-          @for (entry of allItems; track entry.id) {
-            <div class="flex gap-4 p-4 bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30 hover:bg-surface-container-low transition-colors cursor-pointer" (click)="openBox(entry.boxId!)">
-              <div class="w-20 h-20 rounded-lg bg-surface-container-high flex items-center justify-center shrink-0">
-                <span class="material-symbols-outlined text-on-surface-variant">inventory_2</span>
-              </div>
-              <div class="flex-1 min-w-0 flex flex-col justify-between">
-                <div>
-                  <h3 class="text-label-md text-label-md text-on-surface">{{ entry.name }}</h3>
-                  @if (entry.description) {
-                    <p class="text-body-md text-body-md text-on-surface-variant truncate">{{ entry.description }}</p>
-                  }
-                </div>
-                @if (entry.boxName) {
-                  <div class="flex items-center gap-1-half mt-2">
-                    <span class="material-symbols-outlined text-[14px] text-secondary">package_2</span>
-                    <span class="text-label-sm text-label-sm text-secondary">{{ entry.boxName }}</span>
-                  </div>
-                }
-                @if (entry.zoneName) {
-                  <div class="flex items-center gap-1 mt-1">
-                    <span class="material-symbols-outlined text-[12px] text-secondary">shelves</span>
-                    <span class="text-label-sm text-label-sm text-secondary truncate">{{ entry.zoneName }}</span>
-                  </div>
-                }
-              </div>
-              <button class="self-start material-symbols-outlined text-on-surface-variant">chevron_right</button>
-            </div>
-          }
-      </div>
+        <div class="space-y-1">
+          <h2 class="text-headline-md text-on-surface">Nada con «{{ searchQuery() }}»</h2>
+          <p class="text-body-md text-on-surface-variant">Revisa la ortografía o prueba con una palabra más corta.</p>
+        </div>
+        <button class="h-11 px-6 rounded-xl bg-primary text-on-primary text-label-md" (click)="clearSearch()">Nueva búsqueda</button>
+      </section>
     } @else {
-      <p class="text-body-md text-body-md text-on-surface-variant text-center py-4">No se encontraron items</p>
+      <div class="flex flex-col lg:flex-row lg:items-start gap-stack-lg">
+        @if (allItems.length > 0) {
+          <section class="space-y-stack-sm lg:flex-[2] min-w-0">
+            <h2 class="text-label-sm uppercase tracking-wider text-on-surface-variant">Items · {{ allItems.length }}</h2>
+            <div class="grid gap-stack-sm">
+              @for (entry of allItems; track entry.id) {
+                <button type="button" class="w-full text-left flex items-center gap-3 p-3 bg-surface-container-lowest rounded-2xl border border-outline-variant/40 hover:bg-surface-container-low transition-colors" (click)="openBox(entry.boxId!)">
+                  <div class="flex-1 min-w-0">
+                    <p class="text-label-md text-on-surface">
+                      @for (part of highlight(entry.name); track $index) {
+                        @if (part.match) {
+                          <mark class="bg-secondary-container/40 text-on-secondary-fixed rounded px-px">{{ part.text }}</mark>
+                        } @else {{{ part.text }}}
+                      }
+                    </p>
+                    @if (entry.description) {
+                      <p class="text-label-sm text-on-surface-variant truncate">{{ entry.description }}</p>
+                    }
+                    @if (entry.zoneName || entry.boxName) {
+                      <span class="inline-flex items-center gap-1.5 mt-2 h-7 px-2.5 max-w-full bg-surface-container-low rounded-lg text-label-sm text-on-surface">
+                        <span class="material-symbols-outlined text-[14px] text-secondary" aria-hidden="true">location_on</span>
+                        <span class="truncate">
+                          @if (entry.zoneName) {{{ entry.zoneName }}<span class="text-outline"> › </span>}{{ entry.boxName }}
+                        </span>
+                      </span>
+                    }
+                  </div>
+                  <span class="material-symbols-outlined text-outline" aria-hidden="true">chevron_right</span>
+                </button>
+              }
+            </div>
+          </section>
+        }
+
+        @if (filteredBoxes.length > 0) {
+          <section class="space-y-stack-sm lg:flex-1 min-w-0">
+            <h2 class="text-label-sm uppercase tracking-wider text-on-surface-variant">Cajas · {{ filteredBoxes.length }}</h2>
+            <div class="grid gap-stack-sm">
+              @for (box of filteredBoxes; track box.id) {
+                <button type="button" class="w-full text-left flex items-center gap-3 p-3 bg-surface-container-lowest rounded-2xl border border-outline-variant/40 hover:bg-surface-container-low transition-colors" (click)="openBox(box.id!)">
+                  <div class="w-12 h-12 shrink-0 rounded-xl bg-primary-fixed flex items-center justify-center overflow-hidden text-primary">
+                    <app-box-image [boxId]="box.id!" [hasImage]="!!box.hasImage" [alt]="box.name ?? ''" [iconSize]="24" />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-label-md text-on-surface truncate">
+                      @for (part of highlight(box.name); track $index) {
+                        @if (part.match) {
+                          <mark class="bg-secondary-container/40 text-on-secondary-fixed rounded px-px">{{ part.text }}</mark>
+                        } @else {{{ part.text }}}
+                      }
+                    </p>
+                    @if (box.zoneName) {
+                      <p class="text-label-sm text-on-surface-variant truncate">{{ box.zoneName }}</p>
+                    }
+                  </div>
+                </button>
+              }
+            </div>
+          </section>
+        }
+      </div>
     }
-    </section>
   } @else {
-    <section class="py-12 text-center space-y-4">
-      <div class="w-24 h-24 bg-surface-container-high rounded-full flex items-center justify-center mx-auto">
-        <span class="material-symbols-outlined text-[48px] text-on-surface-variant">history</span>
-      </div>
-      <div>
-        <h3 class="text-headline-md text-headline-md text-on-surface">Búsquedas recientes</h3>
-        <p class="text-body-md text-body-md text-on-surface-variant">Prueba buscando por nombre de item o ubicación.</p>
-      </div>
-      <div class="flex flex-wrap justify-center gap-2 max-w-xs mx-auto">
-        <span class="px-3 py-1 bg-surface-container-low text-on-surface-variant rounded-full text-label-sm border border-outline-variant">Documentos</span>
-        <span class="px-3 py-1 bg-surface-container-low text-on-surface-variant rounded-full text-label-sm border border-outline-variant">Pintura</span>
-        <span class="px-3 py-1 bg-surface-container-low text-on-surface-variant rounded-full text-label-sm border border-outline-variant">Ropa de cama</span>
-      </div>
+    <section class="space-y-stack-sm max-w-3xl">
+      @if (recentSearches().length > 0) {
+        <div class="flex justify-between items-center pt-2">
+          <h2 class="text-label-sm uppercase tracking-wider text-on-surface-variant">Recientes</h2>
+          <button class="min-h-11 px-1 text-label-md text-primary" (click)="clearRecents()">Borrar</button>
+        </div>
+        <ul class="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl overflow-hidden divide-y divide-outline-variant/30">
+          @for (recent of recentSearches(); track recent) {
+            <li class="flex items-center">
+              <button class="flex-1 min-h-13 pl-4 flex items-center gap-3 text-left text-body-md text-on-surface" (click)="searchRecent(recent)">
+                <span class="material-symbols-outlined text-[18px] text-outline" aria-hidden="true">history</span>
+                {{ recent }}
+              </button>
+              <button class="w-11 h-11 flex items-center justify-center text-outline" [attr.aria-label]="'Quitar ' + recent" (click)="removeRecent(recent)">
+                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">close</span>
+              </button>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="text-body-md text-on-surface-variant">Busca por nombre de item, caja o ubicación.</p>
+      }
     </section>
   }
 </main>

@@ -14,6 +14,8 @@ import { PageHeaderService } from '../../layout/page-header/page-header.service'
   host: { class: 'block min-h-dvh' },
 })
 export class InventorySearch implements OnInit {
+  private static readonly RECENTS_KEY = 'inventory.recentSearches';
+
   private boxesService = inject(BoxesService);
   private router = inject(Router);
 
@@ -24,10 +26,11 @@ export class InventorySearch implements OnInit {
 
   private searchSubject = new Subject<string>();
 
-  filters = ['Todo', 'Cajas', 'Items'];
+  filters = ['Todo', 'Items', 'Cajas'];
+  recentSearches = signal<string[]>(this.loadRecents());
 
   constructor() {
-    inject(PageHeaderService).setTitle('Home Inventory');
+    inject(PageHeaderService).setTitle('');
 
     this.searchSubject.pipe(
       debounceTime(300),
@@ -37,6 +40,7 @@ export class InventorySearch implements OnInit {
     ).subscribe(result => {
       this.searchResult.set(result);
       this.hasSearched.set(true);
+      this.saveRecent(this.searchQuery().trim());
     });
   }
 
@@ -53,6 +57,71 @@ export class InventorySearch implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  get boxCount(): number {
+    return this.searchResult()?.boxes?.length ?? 0;
+  }
+
+  get itemCount(): number {
+    return this.searchResult()?.items?.length ?? 0;
+  }
+
+  countFor(filter: string): number {
+    if (filter === 'Cajas') return this.boxCount;
+    if (filter === 'Items') return this.itemCount;
+    return this.boxCount + this.itemCount;
+  }
+
+  /** Divide el texto en trozos para resaltar la búsqueda sin usar innerHTML. */
+  highlight(text: string | undefined): { text: string; match: boolean }[] {
+    const value = text ?? '';
+    const q = this.searchQuery().trim();
+    if (!q) return [{ text: value, match: false }];
+    const index = value.toLowerCase().indexOf(q.toLowerCase());
+    if (index < 0) return [{ text: value, match: false }];
+    return [
+      { text: value.slice(0, index), match: false },
+      { text: value.slice(index, index + q.length), match: true },
+      { text: value.slice(index + q.length), match: false },
+    ].filter(part => part.text);
+  }
+
+  searchRecent(query: string): void {
+    this.searchQuery.set(query);
+    this.searchSubject.next(query);
+  }
+
+  removeRecent(query: string): void {
+    this.updateRecents(this.recentSearches().filter(r => r !== query));
+  }
+
+  clearRecents(): void {
+    this.updateRecents([]);
+  }
+
+  private saveRecent(query: string): void {
+    if (!query) return;
+    const next = [query, ...this.recentSearches().filter(r => r !== query)].slice(0, 5);
+    this.updateRecents(next);
+  }
+
+  private updateRecents(recents: string[]): void {
+    this.recentSearches.set(recents);
+    try {
+      localStorage.setItem(InventorySearch.RECENTS_KEY, JSON.stringify(recents));
+    } catch {
+      // almacenamiento no disponible: el historial solo vive en memoria
+    }
+  }
+
+  private loadRecents(): string[] {
+    try {
+      const raw = JSON.parse(localStorage.getItem(InventorySearch.RECENTS_KEY) ?? '[]');
+      return Array.isArray(raw) ? raw.filter(r => typeof r === 'string').slice(0, 5) : [];
+    } catch {
+      return [];
+    }
   }
 
   setFilter(filter: string): void {

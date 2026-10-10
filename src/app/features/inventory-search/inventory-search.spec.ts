@@ -51,7 +51,7 @@ describe('InventorySearch', () => {
   });
 
   it('should set page header title in constructor', () => {
-    expect(mockPageHeaderService.setTitle).toHaveBeenCalledWith('Home Inventory');
+    expect(mockPageHeaderService.setTitle).toHaveBeenCalledWith('');
   });
 
   it('should initialize with default filter set to Todo', () => {
