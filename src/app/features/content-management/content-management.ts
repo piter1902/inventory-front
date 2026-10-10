@@ -17,7 +17,7 @@ interface EditableItem {
   selector: 'app-content-management',
   imports: [],
   templateUrl: './content-management.html',
-  styleUrls: ['../../shared/box-form/box-form.scss', './content-management.scss'],
+  host: { class: 'block' },
 })
 export class ContentManagement implements OnInit {
   private boxesService = inject(BoxesService);

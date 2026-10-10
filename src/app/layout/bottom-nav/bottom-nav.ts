@@ -6,7 +6,7 @@ import { NAV_ITEMS } from '../nav-items';
   selector: 'app-bottom-nav',
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './bottom-nav.html',
-  styleUrl: './bottom-nav.scss',
+  host: { class: 'block md:hidden' },
 })
 export class BottomNav {
   protected readonly barItems = NAV_ITEMS.filter(i => i.mobile === 'bar');

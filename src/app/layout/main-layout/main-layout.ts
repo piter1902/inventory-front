@@ -12,7 +12,7 @@ import { Notifications } from '../../shared/notifications/notifications';
   selector: 'app-main-layout',
   imports: [RouterOutlet, BottomNav, PageHeader, PageTitle, Notifications],
   templateUrl: './main-layout.html',
-  styleUrl: './main-layout.scss',
+  host: { class: 'block min-h-dvh pb-20 md:pb-0' },
 })
 export class MainLayout {
   constructor() {

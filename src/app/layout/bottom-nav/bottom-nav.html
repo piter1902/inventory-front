@@ -17,12 +17,12 @@
 
 @if (drawerOpen()) {
   <div class="fixed top-0 left-0 w-full h-full z-50 pointer-events-none">
-    <div class="drawer-backdrop absolute top-0 left-0 w-full h-full pointer-events-auto" (click)="closeDrawer()"></div>
-    <div class="drawer-panel absolute bottom-0 left-0 w-full pointer-events-auto bg-surface-bright px-4 pt-4">
-      <div class="drawer-pull-bar"></div>
+    <div class="bg-black/40 absolute top-0 left-0 w-full h-full pointer-events-auto" (click)="closeDrawer()"></div>
+    <div class="absolute bottom-0 left-0 w-full pointer-events-auto bg-surface-bright px-4 pt-4 pb-10 rounded-t-2xl shadow-lg">
+      <div class="w-10 h-1.5 bg-outline-variant/50 rounded-full mx-auto mb-4"></div>
       <div class="flex flex-col gap-1">
         @for (item of drawerItems; track item.route) {
-          <a class="drawer-item"
+          <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface hover:bg-surface-container-high transition-colors"
              [routerLink]="item.route"
              routerLinkActive="text-secondary"
              (click)="closeDrawer()">

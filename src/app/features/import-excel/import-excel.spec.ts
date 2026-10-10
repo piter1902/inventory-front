@@ -147,4 +147,31 @@ describe('ImportExcel', () => {
     expect(mockNotificationService.show).toHaveBeenCalledWith('Error al leer el archivo', 'error');
     expect(component.uploading()).toBe(false);
   });
+
+  describe('drag and drop', () => {
+    const dropEvent = (file: File | null) =>
+      ({ preventDefault: vi.fn(), dataTransfer: { files: file ? [file] : [] } }) as unknown as DragEvent;
+
+    it('should toggle dragging on dragover and drop', () => {
+      component.onDragOver({ preventDefault: vi.fn() } as unknown as DragEvent);
+      expect(component.dragging()).toBe(true);
+      component.onDrop(dropEvent(null));
+      expect(component.dragging()).toBe(false);
+    });
+
+    it('should accept dropped xlsx file', () => {
+      const file = new File(['x'], 'cajas.xlsx');
+      component.onDrop(dropEvent(file));
+      expect(component.selectedFile()).toBe(file);
+    });
+
+    it('should reject dropped non-excel file', () => {
+      component.onDrop(dropEvent(new File(['x'], 'foto.png')));
+      expect(component.selectedFile()).toBeNull();
+      expect(mockNotificationService.show).toHaveBeenCalledWith(
+        'Formato no válido. Usa un archivo .xlsx o .xls',
+        'error',
+      );
+    });
+  });
 });

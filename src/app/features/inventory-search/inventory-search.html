@@ -38,11 +38,7 @@
           @for (box of filteredBoxes; track box.id) {
             <div class="min-w-[240px] flex gap-3 p-3 bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30 active:scale-95 transition-transform cursor-pointer" (click)="openBox(box.id!)">
               <div class="w-16 h-16 rounded-lg bg-surface-container flex items-center justify-center overflow-hidden text-on-surface-variant">
-                @if (box.imageBase64) {
-                  <img class="w-full h-full object-cover" [src]="box.imageBase64" [alt]="box.name"/>
-                } @else {
-                  <span class="material-symbols-outlined">inventory_2</span>
-                }
+                <app-box-image [boxId]="box.id!" [hasImage]="!!box.hasImage" [alt]="box.name ?? ''" [iconSize]="24" />
               </div>
               <div class="flex flex-col justify-center overflow-hidden">
                 <p class="text-label-md text-label-md text-on-surface truncate">{{ box.name }}</p>

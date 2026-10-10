@@ -10,7 +10,7 @@ import { BoxDto, BoxSummary, MoveItemsResult } from '../../models/box.models';
   selector: 'app-move-items',
   imports: [],
   templateUrl: './move-items.html',
-  styleUrl: './move-items.scss',
+  host: { class: 'block min-h-dvh' },
 })
 export class MoveItems implements OnInit {
   private boxesService = inject(BoxesService);

@@ -9,7 +9,7 @@ type BoxFilter = 'all' | 'free' | 'other';
   selector: 'app-add-boxes-sheet',
   imports: [BoxImage],
   templateUrl: './add-boxes-sheet.html',
-  styleUrl: './add-boxes-sheet.scss',
+  host: { class: 'contents' },
 })
 export class AddBoxesSheet implements OnInit {
   private readonly boxesService = inject(BoxesService);

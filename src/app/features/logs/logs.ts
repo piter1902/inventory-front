@@ -8,7 +8,7 @@ import { BoxSummary, BoxLogEntry } from '../../models/box.models';
   selector: 'app-logs',
   imports: [DatePipe],
   templateUrl: './logs.html',
-  styleUrl: './logs.scss',
+  host: { class: 'block min-h-dvh' },
 })
 export class Logs implements OnInit {
   private boxesService = inject(BoxesService);

@@ -4,13 +4,14 @@ import { Router } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { BoxesService } from '../../services/boxes.service';
 import { SearchResultDto, SearchBoxResultDto, SearchItemResultDto } from '../../models/box.models';
+import { BoxImage } from '../../shared/box-image/box-image';
 import { PageHeaderService } from '../../layout/page-header/page-header.service';
 
 @Component({
   selector: 'app-inventory-search',
-  imports: [],
+  imports: [BoxImage],
   templateUrl: './inventory-search.html',
-  styleUrl: './inventory-search.scss',
+  host: { class: 'block min-h-dvh' },
 })
 export class InventorySearch implements OnInit {
   private boxesService = inject(BoxesService);

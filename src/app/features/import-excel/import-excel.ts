@@ -8,7 +8,7 @@ import { ImportBoxesResult } from '../../models/import.models';
   selector: 'app-import-excel',
   imports: [],
   templateUrl: './import-excel.html',
-  styleUrl: './import-excel.scss',
+  host: { class: 'block min-h-dvh' },
 })
 export class ImportExcel {
   private importService = inject(ImportService);
@@ -21,11 +21,46 @@ export class ImportExcel {
   selectedFile = signal<File | null>(null);
   uploading = signal(false);
   result = signal<ImportBoxesResult | null>(null);
+  dragging = signal(false);
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
+    this.setFile(file);
+    input.value = '';
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.dragging.set(true);
+  }
+
+  onDragLeave(event: DragEvent): void {
+    const zone = event.currentTarget as HTMLElement;
+    if (event.relatedTarget && zone.contains(event.relatedTarget as Node)) return;
+    this.dragging.set(false);
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.dragging.set(false);
+    const file = event.dataTransfer?.files?.[0];
+    if (!file) return;
+    if (!/\.xlsx?$/i.test(file.name)) {
+      this.notificationService.show('Formato no válido. Usa un archivo .xlsx o .xls', 'error');
+      return;
+    }
+    this.setFile(file);
+  }
+
+  formatSize(bytes: number): string {
+    return bytes < 1024 * 1024
+      ? `${Math.max(1, Math.round(bytes / 1024))} KB`
+      : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  private setFile(file: File): void {
     this.selectedFile.set(file);
     this.result.set(null);
   }

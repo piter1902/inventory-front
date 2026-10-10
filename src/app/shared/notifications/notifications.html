@@ -1,10 +1,16 @@
 <div class="fixed top-16 right-4 z-50 flex flex-col gap-2 pointer-events-none">
   @for (notification of notificationService.notifications(); track notification.id) {
     <div
-      class="notification pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-xl shadow-lg"
-      [class.notification--error]="notification.type === 'error'"
-      [class.notification--success]="notification.type === 'success'"
-      [class.notification--info]="notification.type === 'info'"
+      class="notification pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-xl shadow-lg border min-w-[280px] max-w-[400px] animate-notification-in"
+      [class.bg-error-container]="notification.type === 'error'"
+      [class.text-on-error-container]="notification.type === 'error'"
+      [class.border-error]="notification.type === 'error'"
+      [class.bg-secondary-container]="notification.type === 'success'"
+      [class.text-on-secondary-container]="notification.type === 'success'"
+      [class.border-secondary]="notification.type === 'success'"
+      [class.bg-surface-container-high]="notification.type === 'info'"
+      [class.text-on-surface]="notification.type === 'info'"
+      [class.border-outline-variant]="notification.type === 'info'"
       (click)="notificationService.remove(notification.id)"
     >
       <span class="material-symbols-outlined text-[20px] flex-shrink-0 mt-0.5">

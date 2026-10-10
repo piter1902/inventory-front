@@ -6,7 +6,7 @@ import { NAV_ITEMS } from '../nav-items';
   selector: 'app-top-nav',
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './top-nav.html',
-  styleUrl: './top-nav.scss',
+  host: { class: 'hidden md:block' },
 })
 export class TopNav {
   protected readonly items = NAV_ITEMS;

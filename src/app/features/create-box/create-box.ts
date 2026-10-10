@@ -15,7 +15,7 @@ interface PendingItem {
   selector: 'app-create-box',
   imports: [],
   templateUrl: './create-box.html',
-  styleUrls: ['../../shared/box-form/box-form.scss', './create-box.scss'],
+  host: { class: 'block min-h-dvh' },
 })
 export class CreateBox {
   private boxesService = inject(BoxesService);

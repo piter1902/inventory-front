@@ -1,10 +1,10 @@
-<nav class="top-nav" aria-label="Principal">
+<nav class="flex items-center gap-1" aria-label="Principal">
   @for (item of items; track item.route) {
-    <a class="top-nav-link"
+    <a class="group flex items-center gap-2 h-11 px-4 rounded-[0.625rem] text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors"
        [routerLink]="item.route"
-       routerLinkActive="top-nav-link-active"
+       routerLinkActive="bg-primary-fixed text-primary font-semibold active"
        ariaCurrentWhenActive="page">
-      <span class="material-symbols-outlined">{{ item.icon }}</span>
+      <span class="material-symbols-outlined text-[20px] group-[.active]:[font-variation-settings:'FILL'_1]">{{ item.icon }}</span>
       <span class="text-label-md">{{ item.label }}</span>
     </a>
   }

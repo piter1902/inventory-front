@@ -9,14 +9,14 @@ import { BoxImageService } from '../../services/box-image.service';
   selector: 'app-box-image',
   template: `
     @if (src(); as url) {
-      <img class="box-image" [src]="url" [alt]="alt()" />
+      <img class="size-full object-cover" [src]="url" [alt]="alt()" />
     } @else {
-      <div class="box-image-placeholder" [class.box-image-loading]="loading()">
+      <div class="flex items-center justify-center size-full text-on-surface-variant" [class.animate-pulse]="loading()">
         <span class="material-symbols-outlined" [style.font-size.px]="iconSize()">inventory_2</span>
       </div>
     }
   `,
-  styleUrl: './box-image.scss',
+  host: { class: 'block size-full' },
 })
 export class BoxImage implements OnInit, OnDestroy {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);

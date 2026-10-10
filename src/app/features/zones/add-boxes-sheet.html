@@ -1,71 +1,71 @@
-<div class="sheet-root">
-  <button type="button" class="sheet-backdrop" aria-label="Cerrar" (click)="closed.emit()"></button>
+<div class="fixed inset-0 z-60 flex items-end justify-center">
+  <button type="button" class="absolute inset-0 bg-primary/45" aria-label="Cerrar" (click)="closed.emit()"></button>
 
-  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="add-boxes-title">
-    <div class="sheet-handle"><span></span></div>
+  <div class="relative w-full max-w-2xl h-[88dvh] flex flex-col bg-surface-container-lowest text-on-surface rounded-t-[1.75rem] shadow-[0_-8px_32px_rgba(4,22,50,0.18)]" role="dialog" aria-modal="true" aria-labelledby="add-boxes-title">
+    <div class="flex justify-center pt-2.5 pb-1"><span class="w-10 h-1 rounded-full bg-outline-variant"></span></div>
 
-    <div class="sheet-header">
-      <div class="sheet-title">
-        <h2 id="add-boxes-title" class="text-headline-md text-headline-md">Añadir cajas</h2>
-        <p class="text-label-sm text-label-sm sheet-sub">a {{ zoneName() }}</p>
+    <div class="flex items-center gap-2 pr-2 pl-5">
+      <div class="flex-1 min-w-0">
+        <h2 id="add-boxes-title" class="text-headline-md text-primary">Añadir cajas</h2>
+        <p class="text-label-sm text-on-surface-variant truncate">a {{ zoneName() }}</p>
       </div>
-      <button type="button" class="icon-btn" aria-label="Cerrar" (click)="closed.emit()">
+      <button type="button" class="size-11 rounded-full flex items-center justify-center text-on-surface-variant" aria-label="Cerrar" (click)="closed.emit()">
         <span class="material-symbols-outlined">close</span>
       </button>
     </div>
 
-    <div class="sheet-search">
-      <label>
+    <div class="px-5 pt-2">
+      <label class="flex items-center gap-2.5 h-12 px-3.5 rounded-[14px] bg-surface-container text-outline">
         <span class="material-symbols-outlined">search</span>
-        <input type="text" placeholder="Buscar por nombre o código" aria-label="Buscar cajas"
+        <input class="flex-1 min-w-0 border-0 outline-none bg-transparent text-[15px] text-on-surface" type="text" placeholder="Buscar por nombre o código" aria-label="Buscar cajas"
                (input)="query.set($any($event.target).value)"/>
       </label>
     </div>
 
-    <div class="sheet-filters">
+    <div class="flex gap-2 px-5 pt-3 pb-2 overflow-x-auto">
       @for (f of filters; track f.id) {
-        <button type="button" class="pill" [class.pill-on]="filter() === f.id" (click)="filter.set(f.id)">{{ f.label }}</button>
+        <button type="button" class="h-9 px-3.5 rounded-full whitespace-nowrap text-[13.5px] font-bold border-[1.5px]" [class.border-outline-variant]="filter() !== f.id" [class.bg-surface-container-lowest]="filter() !== f.id" [class.text-primary]="filter() !== f.id" [class.bg-primary]="filter() === f.id" [class.border-primary]="filter() === f.id" [class.text-on-primary]="filter() === f.id" (click)="filter.set(f.id)">{{ f.label }}</button>
       }
     </div>
 
-    <div class="sheet-list">
+    <div class="flex-1 min-h-0 overflow-y-auto px-3 pt-1 pb-3">
       @for (box of candidates(); track box.id) {
-        <button type="button" class="row" [class.row-on]="selected().has(box.id)"
+        <button type="button" class="w-full min-h-16 flex items-center gap-3.5 px-2 py-2.5 rounded-2xl text-left" [class.bg-secondary-container/25]="selected().has(box.id)"
                 [attr.aria-pressed]="selected().has(box.id)" (click)="toggle(box.id)">
-          <span class="row-thumb">
+          <span class="size-12 rounded-xl shrink-0 overflow-hidden flex items-center justify-center bg-surface-container-high text-on-surface-variant">
             <app-box-image [boxId]="box.id" [hasImage]="box.hasImage" [alt]="box.name" [iconSize]="22" />
           </span>
-          <span class="row-text">
-            <span class="row-name text-label-md text-label-md">{{ box.name }}</span>
-            <span class="row-meta text-label-sm text-label-sm" [class.row-meta-warn]="box.zoneId">
+          <span class="flex-1 min-w-0 flex flex-col gap-0.5">
+            <span class="text-label-md text-primary truncate">{{ box.name }}</span>
+            <span class="text-label-sm" [class]="box.zoneId ? 'text-[#8a5300] dark:text-[#ffb95c]' : 'text-on-surface-variant'">
               @if (box.identifier) { {{ box.identifier }} · }
               @if (box.zoneId) { Ahora en {{ box.zoneName || 'otra zona' }} } @else { Sin zona }
             </span>
           </span>
-          <span class="check" [class.check-on]="selected().has(box.id)">
+          <span class="size-6.5 rounded-lg shrink-0 flex items-center justify-center border-2" [class.border-outline]="!selected().has(box.id)" [class.bg-secondary]="selected().has(box.id)" [class.border-secondary]="selected().has(box.id)">
             @if (selected().has(box.id)) {
-              <span class="material-symbols-outlined">check</span>
+              <span class="material-symbols-outlined text-lg text-on-secondary">check</span>
             }
           </span>
         </button>
       } @empty {
-        <div class="sheet-empty">
-          <span class="material-symbols-outlined">inventory_2</span>
-          <p class="text-body-md text-body-md">
+        <div class="py-12 text-center text-on-surface-variant">
+          <span class="material-symbols-outlined block text-4xl mb-2">inventory_2</span>
+          <p class="text-body-md">
             @if (loading()) { Cargando cajas... } @else { No hay cajas que coincidan }
           </p>
         </div>
       }
     </div>
 
-    <div class="sheet-footer">
-      <button type="button" class="cta" [disabled]="selected().size === 0" (click)="confirm()">
+    <div class="px-5 pt-3 pb-6 border-t border-outline-variant/40">
+      <button type="button" class="w-full h-13 rounded-full text-base font-bold bg-secondary text-on-secondary disabled:bg-surface-container-highest disabled:text-on-surface-variant disabled:cursor-default" [disabled]="selected().size === 0" (click)="confirm()">
         @if (selected().size === 0) { Selecciona cajas }
         @else if (selected().size === 1) { Añadir 1 caja }
         @else { Añadir {{ selected().size }} cajas }
       </button>
       @if (movingCount() > 0) {
-        <p class="move-note text-label-sm text-label-sm">
+        <p class="mt-2 text-center text-label-sm text-[#8a5300] dark:text-[#ffb95c]">
           {{ movingCount() === 1 ? '1 caja se moverá desde otra zona' : movingCount() + ' cajas se moverán desde otra zona' }}
         </p>
       }

@@ -11,7 +11,7 @@ import { PageHeaderService } from '../../layout/page-header/page-header.service'
   selector: 'app-box-detail',
   imports: [RouterLink, DatePipe],
   templateUrl: './box-detail.html',
-  styleUrl: './box-detail.scss',
+  host: { class: 'block min-h-dvh' },
 })
 export class BoxDetail implements OnInit {
   private boxesService = inject(BoxesService);

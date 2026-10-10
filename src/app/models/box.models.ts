@@ -67,7 +67,7 @@ export interface SearchBoxResultDto {
   id?: string;
   name?: string;
   description?: string;
-  imageBase64?: string;
+  hasImage?: boolean;
   zoneName?: string;
 }
 

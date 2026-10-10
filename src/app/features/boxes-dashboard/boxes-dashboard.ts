@@ -12,7 +12,7 @@ import { NotificationService } from '../../services/notification.service';
   selector: 'app-boxes-dashboard',
   imports: [RouterLink, CreateButton, BoxImage],
   templateUrl: './boxes-dashboard.html',
-  styleUrl: './boxes-dashboard.scss',
+  host: { class: 'block min-h-dvh' },
 })
 export class BoxesDashboard implements OnInit {
   private boxesService = inject(BoxesService);

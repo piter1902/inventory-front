@@ -1,96 +1,178 @@
-<main class="px-container-padding-mobile md:px-container-padding-desktop pt-stack-md max-w-2xl mx-auto">
-  <section class="space-y-stack-lg">
-    <div
-      class="relative border-2 border-dashed border-outline-variant rounded-2xl p-8 text-center hover:bg-surface-container-low transition-colors cursor-pointer group"
-      (click)="fileInput.click()">
-      <input #fileInput type="file" accept=".xlsx,.xls" class="hidden" (change)="onFileSelected($event)"/>
-      <div class="flex flex-col items-center gap-3">
-        <div class="w-16 h-16 rounded-full bg-secondary-container flex items-center justify-center group-active:scale-90 transition-transform">
-          <span class="material-symbols-outlined text-3xl text-on-secondary-container" style="font-variation-settings: 'wght' 600;">upload_file</span>
-        </div>
-        @if (selectedFile(); as file) {
-          <div class="flex items-center gap-2 bg-surface-container-high px-4 py-2 rounded-xl">
-            <span class="material-symbols-outlined text-secondary">description</span>
-            <span class="text-body-md text-body-md text-on-surface">{{ file.name }}</span>
-            <button
-              class="material-symbols-outlined text-error hover:bg-error-container/20 p-1 rounded-full transition-colors active:scale-90"
-              (click)="removeFile(); $event.stopPropagation()">close</button>
-          </div>
-        } @else {
-          <p class="text-body-md text-body-md text-on-surface-variant">
-            Haz clic para seleccionar un archivo Excel
-          </p>
-          <p class="text-label-sm text-label-sm text-on-surface-variant/60">
-            Formatos aceptados: .xlsx, .xls
-          </p>
-        }
-      </div>
-    </div>
+<main class="max-w-5xl mx-auto px-4 pt-4 pb-8 md:px-8 md:pt-8 md:pb-12">
+  @if (!result()) {
+    <p class="mb-4 text-sm leading-[21px] text-on-surface-variant">
+      Crea varias cajas de una vez. Cada hoja del Excel es una caja con sus objetos.
+    </p>
 
-    @if (selectedFile() && !result()) {
-      <button
-        class="w-full h-14 bg-secondary text-on-secondary rounded-full text-label-md text-label-md font-bold shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-transform duration-150"
-        [class.opacity-60]="uploading()"
-        [disabled]="uploading()"
-        (click)="upload()">
-        @if (uploading()) {
-          <span>Importando...</span>
+    <div class="flex flex-col gap-6 md:flex-row md:items-start">
+      <section class="flex-1 min-w-0 flex flex-col gap-3">
+        <h2 class="text-[15px] font-semibold text-on-surface">Sube tu archivo</h2>
+
+        @if (selectedFile(); as file) {
+          <div class="flex items-center gap-3 p-4 bg-surface-container-lowest border-2 border-secondary rounded-2xl">
+            <div class="size-12 shrink-0 flex items-center justify-center rounded-xl bg-secondary-container text-on-secondary-container">
+              <span class="material-symbols-outlined">description</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-[15px] font-semibold text-on-surface truncate">{{ file.name }}</p>
+              <p class="text-[13px] text-on-surface-variant">{{ formatSize(file.size) }} · Listo para importar</p>
+            </div>
+            <button type="button" aria-label="Quitar archivo"
+                    class="size-11 shrink-0 flex items-center justify-center rounded-full bg-surface-container-low text-error"
+                    (click)="removeFile()">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          <button type="button"
+                  class="self-start min-h-11 px-1 text-sm font-semibold underline text-primary"
+                  (click)="fileInput.click()">Elegir otro archivo</button>
         } @else {
-          <span class="material-symbols-outlined">file_upload</span>
-          <span>Importar archivo</span>
+          <div
+            class="group flex flex-col items-center justify-center gap-2.5 px-4 py-8 md:px-6 md:py-14 text-center cursor-pointer border-2 border-dashed rounded-2xl transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary *:pointer-events-none"
+            [class.bg-surface-container-lowest]="!dragging()"
+            [class.border-outline-variant]="!dragging()"
+            [class.hover:bg-surface-container-low]="!dragging()"
+            [class.bg-secondary-container]="dragging()"
+            [class.border-secondary]="dragging()"
+            role="button"
+            tabindex="0"
+            aria-label="Seleccionar archivo Excel"
+            (click)="fileInput.click()"
+            (keydown.enter)="fileInput.click()"
+            (keydown.space)="fileInput.click(); $event.preventDefault()"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)">
+            <div class="size-16 flex items-center justify-center rounded-full"
+                 [class.bg-secondary-container]="!dragging()"
+                 [class.text-on-secondary-container]="!dragging()"
+                 [class.bg-secondary]="dragging()"
+                 [class.text-on-secondary]="dragging()">
+              <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'wght' 600;">upload_file</span>
+            </div>
+            @if (dragging()) {
+              <p class="text-base font-semibold text-on-secondary-container">Suelta el archivo para cargarlo</p>
+            } @else {
+              <p class="text-base font-semibold text-on-surface">
+                <span class="md:hidden">Toca para elegir un archivo</span>
+                <span class="hidden md:inline">Arrastra tu Excel aquí o haz clic para seleccionarlo</span>
+              </p>
+            }
+            <p class="text-[13px]" [class.text-on-surface-variant]="!dragging()" [class.text-on-secondary-container]="dragging()">
+              Formatos aceptados: .xlsx, .xls
+            </p>
+          </div>
         }
-      </button>
-    }
-  </section>
+
+        <input #fileInput type="file" accept=".xlsx,.xls" class="hidden" (change)="onFileSelected($event)" />
+
+        <button type="button"
+                class="h-14 flex items-center justify-center gap-2 rounded-full text-[15px] font-bold bg-secondary text-on-secondary shadow-[0_4px_12px_rgba(0,110,47,0.3)] disabled:bg-surface-container-highest disabled:text-on-surface-variant disabled:shadow-none disabled:cursor-not-allowed"
+                [disabled]="!selectedFile() || uploading()"
+                (click)="upload()">
+          @if (uploading()) {
+            <span>Importando...</span>
+          } @else {
+            <span class="material-symbols-outlined">file_upload</span>
+            <span>Importar archivo</span>
+          }
+        </button>
+      </section>
+
+      <aside class="flex flex-col gap-4 p-5 bg-surface-container-lowest border border-outline-variant rounded-2xl md:w-80 md:shrink-0">
+        <h2 class="text-[15px] font-semibold text-on-surface">Plantilla base</h2>
+
+        <div class="text-xs overflow-hidden border border-outline-variant rounded-lg" aria-hidden="true">
+          <div class="flex border-b border-outline-variant">
+            <div class="w-14 shrink-0 px-2 py-1.5 border-r border-outline-variant font-bold text-primary">Caja:</div>
+            <div class="flex-1 px-2 py-1.5 text-secondary bg-secondary-container/25">Nombre de la caja</div>
+          </div>
+          <div class="flex border-b border-outline-variant">
+            <div class="w-14 shrink-0 px-2 py-1.5 border-r border-outline-variant font-bold text-primary">Zona:</div>
+            <div class="flex-1 px-2 py-1.5 text-on-surface-variant bg-surface-container-low">Opcional</div>
+          </div>
+          <div class="flex border-b border-outline-variant">
+            <div class="w-14 shrink-0 px-2 py-1.5 border-r border-outline-variant font-bold text-primary">Items:</div>
+            <div class="flex-1 px-2 py-1.5">&nbsp;</div>
+          </div>
+          <div class="flex">
+            <div class="w-14 shrink-0 px-2 py-1.5 border-r border-outline-variant"></div>
+            <div class="flex-1 px-2 py-1.5 border-r border-outline-variant text-secondary bg-secondary-container/25">Nombre</div>
+            <div class="flex-1 px-2 py-1.5 text-on-surface-variant bg-surface-container-low">Descripción</div>
+          </div>
+        </div>
+
+        <ol class="list-decimal pl-5 text-sm leading-[22px] text-on-surface-variant space-y-1">
+          <li>Descarga la plantilla.</li>
+          <li>Una hoja por caja; duplica la hoja para añadir más.</li>
+          <li>Rellena los objetos y súbela.</li>
+        </ol>
+
+        <a href="caja_import_template.xlsx" download="caja_import_template.xlsx"
+           class="min-h-12 flex items-center justify-center gap-2 border-[1.5px] border-primary rounded-full text-[15px] font-semibold text-primary hover:bg-surface-container-low transition-colors">
+          <span class="material-symbols-outlined">download</span>
+          Descargar plantilla
+        </a>
+      </aside>
+    </div>
+  }
 
   @if (result(); as res) {
-    <section class="mt-stack-xl space-y-stack-md">
-      <div class="flex items-center gap-4">
-        <h2 class="text-headline-md text-headline-md text-primary">Resultado</h2>
-        <div class="flex gap-3">
-          <span class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full text-label-sm">
-            {{ res.totalSheets }} hojas
-          </span>
-          <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-label-sm dark:bg-green-900 dark:text-green-200">
-            {{ res.successCount }} ok
-          </span>
-          @if (res.failureCount > 0) {
-            <span class="bg-error-container text-on-error-container px-3 py-1 rounded-full text-label-sm">
-              {{ res.failureCount }} errores
-            </span>
+    <section class="max-w-2xl mx-auto flex flex-col gap-4">
+      <div class="flex flex-col gap-4 p-5 rounded-2xl bg-primary text-on-primary">
+        <div>
+          <h2 class="text-xl font-bold">Importación finalizada</h2>
+          @if (selectedFile(); as file) {
+            <p class="mt-1 text-[13px] opacity-80 truncate">{{ file.name }}</p>
           }
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div class="px-3 py-2.5 rounded-xl bg-primary-container text-on-primary-container">
+            <strong class="block text-2xl leading-8 font-bold">{{ res.totalSheets }}</strong>
+            <span class="text-xs">hojas</span>
+          </div>
+          <div class="px-3 py-2.5 rounded-xl bg-primary-container text-on-primary-container">
+            <strong class="block text-2xl leading-8 font-bold text-secondary-fixed-dim">{{ res.successCount }}</strong>
+            <span class="text-xs">correctas</span>
+          </div>
+          <div class="px-3 py-2.5 rounded-xl bg-primary-container text-on-primary-container">
+            <strong class="block text-2xl leading-8 font-bold" [class]="res.failureCount > 0 ? 'text-[#ffb4ab]' : ''">{{ res.failureCount }}</strong>
+            <span class="text-xs">con error</span>
+          </div>
         </div>
       </div>
 
       @if (res.results?.length) {
-        <div class="space-y-stack-sm">
+        <h3 class="text-[15px] font-semibold text-on-surface">Detalle por hoja</h3>
+        <div class="flex flex-col gap-2">
           @for (r of res.results; track $index) {
-            <div
-              class="flex items-center gap-3 p-4 rounded-xl border"
-              [class.bg-surface-container-low]="r.success"
-              [class.border-outline-variant/30]="r.success"
-              [class.bg-error-container/10]="!r.success"
-              [class.border-error/30]="!r.success">
-              <span class="material-symbols-outlined" [class.text-green-600]="r.success" [class.text-error]="!r.success">
+            <div class="flex items-start gap-3 px-3.5 py-3 rounded-xl border"
+                 [class.bg-surface-container-lowest]="r.success"
+                 [class.border-outline-variant]="r.success"
+                 [class.bg-error-container/40]="!r.success"
+                 [class.border-error]="!r.success">
+              <span class="material-symbols-outlined"
+                    [class.text-secondary]="r.success"
+                    [class.text-error]="!r.success"
+                    [attr.aria-label]="r.success ? 'Correcto' : 'Error'">
                 {{ r.success ? 'check_circle' : 'error' }}
               </span>
               <div class="flex-1 min-w-0">
-                <p class="text-body-md text-body-md text-on-surface">{{ r.boxName || r.sheetName }}</p>
-                @if (r.error) {
-                  <p class="text-label-sm text-label-sm text-error mt-0.5">{{ r.error }}</p>
+                <p class="text-[15px] font-semibold text-on-surface">{{ r.boxName || ('Hoja: ' + r.sheetName) }}</p>
+                @if (r.success) {
+                  <p class="text-xs text-on-surface-variant">Hoja: {{ r.sheetName }}</p>
+                } @else if (r.error) {
+                  <p class="mt-0.5 text-[13px] leading-[18px] text-error">{{ r.error }}</p>
                 }
               </div>
-              <span class="text-label-sm text-label-sm text-on-surface-variant">{{ r.sheetName }}</span>
             </div>
           }
         </div>
       }
 
-      <button
-        class="w-full h-12 bg-surface-container-high text-on-surface rounded-xl text-label-md text-label-md font-bold active:scale-95 transition-transform"
-        (click)="reset()">
-        Importar otro archivo
-      </button>
+      <button type="button"
+              class="h-12 border-[1.5px] border-outline-variant rounded-full text-[15px] font-semibold text-on-surface"
+              (click)="reset()">Importar otro archivo</button>
     </section>
   }
 </main>
