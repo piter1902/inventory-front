@@ -1,5 +1,5 @@
 <main class="px-container-padding-mobile md:px-container-padding-desktop pt-stack-md max-w-7xl mx-auto">
-  <div class="mb-stack-lg sticky top-16 bg-surface-bright/80 backdrop-blur-md py-4 z-30 flex items-center gap-4">
+  <div class="mb-stack-lg sticky top-16 bg-surface-bright/80 md:backdrop-blur-md py-4 z-30 flex items-center gap-4">
     <div class="relative group flex-1">
       <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
         <span class="material-symbols-outlined text-outline leading-none">search</span>
@@ -64,7 +64,7 @@
               </button>
               @if (openMenuId() === box.id) {
                 <!-- backdrop -->
-                <div class="fixed inset-0 z-40" (click)="closeMenu()"></div>
+                <div class="fixed inset-0 z-40" (click)="$event.stopPropagation(); closeMenu()"></div>
                 <!-- menu -->
                 <div class="absolute right-0 top-10 z-50 bg-surface-container-lowest rounded-xl shadow-lg border border-outline-variant/30 py-2 min-w-40 overflow-hidden" (click)="$event.stopPropagation()">
                   <button class="w-full flex items-center gap-3 px-4 py-3 text-on-surface hover:bg-surface-container-high transition-colors text-label-md" (click)="openBox(box.id); closeMenu()">
