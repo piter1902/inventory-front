@@ -2,8 +2,10 @@
 
 ## Design
 
-provider: figma       # figma | wireframes
+provider: wireframes       # figma | wireframes
 figma-file: https://www.figma.com/design/yiLKmaoTXEq3cquQ7ReuNk/Inventory  # Figma file URL; design-screens asks for it when empty
+figma-library:        # published design-system library, optional
+design-system-page: 0 · Design system   # Figma page with the shared foundations and components
 
 ## Tickets
 
@@ -27,5 +29,5 @@ claude-code-review-level: high   # low | medium | high | xhigh | max
 base: main                       # branch the diff is taken against
 runner: claude-cli               # claude-cli | codex-cli | subagent
 verifier-runner: same            # same | claude-cli | codex-cli | subagent
-extra: claude-security-review    # claude-security-review | none
+extra: none                      # claude-security-review | none (headless /security-review returns empty in Claude Code 2.1.302)
 lenses: all                      # all | comma-separated list of lenses

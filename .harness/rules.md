@@ -2,7 +2,7 @@
 
 Adapts the harness base rules (SOLID, `implementation-rules.md`, ids `B-*`) to this repository. **This file wins on any conflict.** Keep it short; the repository's own `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md` and linter configs stay authoritative and are not copied here.
 
-- Updated: 2026-10-18
+- Updated: 2026-10-18 (retro INV-001)
 
 ## Commands
 - Build: `npm run build` (seen in `package.json`)
@@ -16,6 +16,7 @@ Adapts the harness base rules (SOLID, `implementation-rules.md`, ids `B-*`) to t
 - Branch name: `feature/<ID>` (e.g. `feature/INV-001`)
 - Commit message: `[<ID>] <type>: <imperative summary>` with conventional-commit types (`feat`, `fix`, `test`, `refactor`, `style`, `chore`, `docs`), e.g. `[INV-001] feat: replace box overlay menu with actions dialog`
 - Commit trailers: **none** — no `Co-Authored-By` or other AI attribution/session lines (P-005)
+- Fix commits: `single` — all review fixes in one commit, amended per round while unpushed (P-008)
 
 ## Project conventions
 - Angular 21 standalone components with signals, `input()`/`output()`, `inject()` and the new control flow (`@if`, `@for`).
@@ -27,13 +28,15 @@ Adapts the harness base rules (SOLID, `implementation-rules.md`, ids `B-*`) to t
 ## Overrides of base rules
 
 ## Project rules
-- P-001 Run `npx prettier --write` on every file the change creates or modifies (whole file), even if that reformats lines unrelated to the change; many files on `main` are not Prettier-clean yet | Reason: converge the codebase on the repo's `.prettierrc` | Source: user, implement INV-001 | Date: 2026-10-18
+- P-001 Run `npx prettier --write` on every file the change creates or modifies (whole file), even if that reformats lines unrelated to the change; many files on `main` are not Prettier-clean yet. Pass file paths, never folders, and stage files by path (never `git add src`) so untouched files are not reformatted (sharpened in retro INV-001) | Reason: converge the codebase on the repo's `.prettierrc` | Source: user, implement INV-001 | Date: 2026-10-18
 - P-002 Browser checks run with playwright-cli in a headed browser where the user logs in (OIDC on sso.allue.eu) against their local backend; destructive requests (DELETE/POST/PUT) are intercepted with `page.route` and answered locally so no real data changes | Reason: the app is behind login and the backend holds real data | Source: user, implement INV-001 | Date: 2026-10-18
 - P-003 To run one spec: `npx ng test --watch=false --include='<path>.spec.ts'`; a folder glob (`dir/**`) also picks up non-spec `.ts` files and reports "No test suite found" | Reason: observed in INV-001 | Source: user, implement INV-001 | Date: 2026-10-18
 - P-004 Specs that render a `<dialog>` call `installDialogStub()` from `src/testing/dialog-stub.ts` in `beforeEach` and restore it in `afterEach` (jsdom has no `showModal`/`close`) | Reason: one shared stub (D-020 of INV-001) | Source: user, implement INV-001 | Date: 2026-10-18
 - P-005 Commits carry no `Co-Authored-By` or other AI attribution/session trailers; one commit per plan step is expected (B-H1) | Reason: the user does not want the AI as co-author | Source: user, implement INV-001 | Date: 2026-10-18
 
 - P-006 New modals are native `<dialog appModalDialog>` (`src/app/shared/dialog/modal-dialog.ts`): it owns showModal, Escape/backdrop dismissal and the animated close; components do not reimplement that lifecycle. Reuse `ConfirmDialog` for confirmations instead of `window.confirm` | Reason: duplicated lifecycle caused review findings R-1..R-3/R-6 in INV-001 | Source: user, review-code INV-001 | Date: 2026-10-18
+- P-007 Browser checks for UI with enter/exit animations include fast input sequences driven with `page.mouse` (double tap, a tap during the exit animation, act on the page underneath), not only `locator.click()` (which waits for stability and hides timing bugs); re-run them after every fix round | Reason: R-23 in INV-001 only showed up with real pointer timing | Source: retro INV-001 | Date: 2026-10-18
+- P-008 Fix rounds: all review fixes of a ticket go into one commit, `[<ID>] fix: address code review findings`, amended in each round while the branch is unpushed (a new fix commit only once it has been pushed) | Reason: user preference, INV-001 | Source: retro INV-001 | Date: 2026-10-18
 
 ## Stack checklist
 - Angular: no manual subscriptions left open in components that outlive the request; signals updated immutably.
