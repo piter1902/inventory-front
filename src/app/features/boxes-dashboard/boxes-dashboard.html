@@ -75,65 +75,50 @@
               class="bg-secondary-container/30 text-on-secondary-container px-3 py-1 rounded-lg text-label-sm"
               >{{ box.identifier }}</span
             >
-            <div class="relative">
-              <button
-                class="flex items-center justify-center w-8 h-8 text-on-surface-variant hover:text-primary transition-colors active:scale-90"
-                (click)="toggleMenu($event, box.id)"
-              >
-                @if (deletingId() === box.id) {
-                  <span class="material-symbols-outlined animate-spin text-sm"
-                    >progress_activity</span
-                  >
-                } @else {
-                  <span class="material-symbols-outlined">more_vert</span>
-                }
-              </button>
-              @if (openMenuId() === box.id) {
-                <!-- backdrop -->
-                <div
-                  class="fixed inset-0 z-40"
-                  (click)="$event.stopPropagation(); closeMenu()"
-                ></div>
-                <!-- menu -->
-                <div
-                  class="absolute right-0 top-10 z-50 bg-surface-container-lowest rounded-xl shadow-lg border border-outline-variant/30 py-2 min-w-40 overflow-hidden"
-                  (click)="$event.stopPropagation()"
+            <!-- aria-disabled instead of disabled: a disabled button would let the click reach the card and navigate. -->
+            <button
+              type="button"
+              class="flex items-center justify-center size-11 -mr-2 rounded-full text-on-surface-variant hover:text-primary transition-colors active:scale-90 aria-disabled:cursor-default aria-disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              aria-haspopup="dialog"
+              [attr.aria-label]="
+                deletingId() === box.id ? 'Eliminando ' + box.name + '…' : 'Acciones de ' + box.name
+              "
+              [attr.aria-disabled]="deletingId() === box.id ? 'true' : null"
+              (click)="openActions($event, box)"
+            >
+              @if (deletingId() === box.id) {
+                <span class="material-symbols-outlined animate-spin text-sm" aria-hidden="true"
+                  >progress_activity</span
                 >
-                  <button
-                    class="w-full flex items-center gap-3 px-4 py-3 text-on-surface hover:bg-surface-container-high transition-colors text-label-md"
-                    (click)="openBox(box.id); closeMenu()"
-                  >
-                    <span class="material-symbols-outlined text-[20px]">visibility</span>
-                    Ver
-                  </button>
-                  <button
-                    class="w-full flex items-center gap-3 px-4 py-3 text-on-surface hover:bg-surface-container-high transition-colors text-label-md"
-                    (click)="editBox(box.id)"
-                  >
-                    <span class="material-symbols-outlined text-[20px]">edit</span>
-                    Modificar
-                  </button>
-                  <button
-                    class="w-full flex items-center gap-3 px-4 py-3 text-on-surface hover:bg-surface-container-high transition-colors text-label-md"
-                    (click)="moveItemsFromBox(box.id)"
-                  >
-                    <span class="material-symbols-outlined text-[20px]">drive_file_move</span>
-                    Mover items
-                  </button>
-                  <div class="h-px bg-outline-variant/30 my-1"></div>
-                  <button
-                    class="w-full flex items-center gap-3 px-4 py-3 text-error hover:bg-error-container/20 transition-colors text-label-md"
-                    (click)="deleteBox($event, box.id, box.name)"
-                  >
-                    <span class="material-symbols-outlined text-[20px]">delete</span>
-                    Eliminar
-                  </button>
-                </div>
+              } @else {
+                <span class="material-symbols-outlined" aria-hidden="true">more_vert</span>
               }
-            </div>
+            </button>
           </div>
         </div>
       </div>
     }
   </div>
+
+  @if (actionsBox(); as box) {
+    <app-box-actions-sheet
+      [box]="box"
+      (view)="openBox(box.id)"
+      (edit)="editBox(box.id)"
+      (moveItems)="moveItemsFromBox(box.id)"
+      (deleteRequested)="confirmBox.set(box)"
+      (closed)="closeActions()"
+    />
+  }
+
+  @if (confirmBox(); as box) {
+    <app-confirm-dialog
+      title="¿Eliminar la caja?"
+      [message]="deleteMessage(box.name)"
+      confirmLabel="Eliminar"
+      [destructive]="true"
+      (confirmed)="confirmDelete(box)"
+      (cancelled)="confirmBox.set(null)"
+    />
+  }
 </main>

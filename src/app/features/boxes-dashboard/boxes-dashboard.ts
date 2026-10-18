@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, viewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { BoxesService } from '../../services/boxes.service';
 import { ZonesService } from '../../services/zones.service';
@@ -7,10 +7,12 @@ import { PageHeaderService } from '../../layout/page-header/page-header.service'
 import { BoxImage } from '../../shared/box-image/box-image';
 import { CreateButton } from '../../shared/create-button/create-button';
 import { NotificationService } from '../../services/notification.service';
+import { ConfirmDialog } from '../../shared/confirm-dialog/confirm-dialog';
+import { BoxActionsSheet } from './box-actions-sheet';
 
 @Component({
   selector: 'app-boxes-dashboard',
-  imports: [RouterLink, CreateButton, BoxImage],
+  imports: [RouterLink, CreateButton, BoxImage, BoxActionsSheet, ConfirmDialog],
   templateUrl: './boxes-dashboard.html',
   host: { class: 'block min-h-dvh' },
 })
@@ -27,8 +29,12 @@ export class BoxesDashboard implements OnInit {
   boxes = signal<BoxSummary[]>([]);
   zoneMap = signal<Map<string, string>>(new Map());
   searchQuery = signal('');
-  openMenuId = signal<string | null>(null);
+  actionsBox = signal<BoxSummary | null>(null);
+  confirmBox = signal<BoxSummary | null>(null);
   deletingId = signal<string | null>(null);
+
+  private readonly actionsSheet = viewChild(BoxActionsSheet);
+  private actionsTrigger: HTMLElement | null = null;
 
   get totalBoxes(): number {
     return this.boxes().length;
@@ -62,6 +68,7 @@ export class BoxesDashboard implements OnInit {
   }
 
   openBox(id: string): void {
+    this.dismissActions();
     this.router.navigate(['/boxes', id]);
   }
 
@@ -69,41 +76,54 @@ export class BoxesDashboard implements OnInit {
     this.router.navigate(['/boxes/new']);
   }
 
-  toggleMenu(event: MouseEvent, id: string): void {
+  openActions(event: MouseEvent, box: BoxSummary): void {
     event.stopPropagation();
-    this.openMenuId.set(this.openMenuId() === id ? null : id);
+    if (this.deletingId() === box.id) return;
+    this.actionsTrigger = event.currentTarget as HTMLElement;
+    this.actionsBox.set(box);
   }
 
-  closeMenu(): void {
-    this.openMenuId.set(null);
+  /** The sheet was dismissed without choosing an action: give focus back to its three-dots button. */
+  closeActions(): void {
+    const trigger = this.actionsTrigger;
+    this.dismissActions();
+    trigger?.focus();
   }
 
   editBox(id: string): void {
-    this.closeMenu();
+    this.dismissActions();
     this.router.navigate(['/boxes', id, 'edit']);
   }
 
   moveItemsFromBox(id: string): void {
-    this.closeMenu();
+    this.dismissActions();
     this.router.navigate(['/boxes', id, 'move-items']);
   }
 
-  deleteBox(event: MouseEvent, id: string, name: string): void {
-    event.stopPropagation();
-    this.closeMenu();
-    if (!window.confirm(`¿Eliminar la caja "${name}"? Esta acción no se puede deshacer.`)) return;
+  deleteMessage(name: string): string {
+    return `Se eliminará "${name}" y todo su contenido. Esta acción no se puede deshacer.`;
+  }
 
-    this.deletingId.set(id);
-    this.boxesService.delete(id).subscribe({
+  confirmDelete(box: BoxSummary): void {
+    this.confirmBox.set(null);
+    this.deletingId.set(box.id);
+    this.actionsSheet()?.close();
+
+    this.boxesService.delete(box.id).subscribe({
       next: () => {
-        this.boxes.update((list) => list.filter((b) => b.id !== id));
-        this.notificationService.show(`Caja "${name}" eliminada`, 'success');
+        this.boxes.update((list) => list.filter((b) => b.id !== box.id));
+        this.notificationService.show(`Caja "${box.name}" eliminada`, 'success');
         this.deletingId.set(null);
       },
       error: () => {
         this.deletingId.set(null);
       },
     });
+  }
+
+  private dismissActions(): void {
+    this.actionsBox.set(null);
+    this.actionsTrigger = null;
   }
 
   onSearch(event: Event): void {

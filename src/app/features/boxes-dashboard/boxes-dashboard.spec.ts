@@ -4,9 +4,10 @@ import { BoxesService } from '../../services/boxes.service';
 import { ZonesService } from '../../services/zones.service';
 import { PageHeaderService } from '../../layout/page-header/page-header.service';
 import { Router } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 import { BoxSummary } from '../../models/box.models';
 import { NotificationService } from '../../services/notification.service';
+import { installDialogStub } from '../../../testing/dialog-stub';
 
 describe('BoxesDashboard', () => {
   const mockBoxes: BoxSummary[] = [
@@ -39,8 +40,12 @@ describe('BoxesDashboard', () => {
   let mockRouter: { navigate: ReturnType<typeof vi.fn> };
   let mockPageHeaderService: { setTitle: ReturnType<typeof vi.fn> };
   let mockNotificationService: { show: ReturnType<typeof vi.fn> };
+  let restoreDialog: () => void;
+
+  afterEach(() => restoreDialog());
 
   beforeEach(async () => {
+    restoreDialog = installDialogStub();
     mockBoxesService = { getAll: vi.fn(() => of(mockBoxes)), delete: vi.fn() };
     mockZonesService = { getAll: vi.fn(() => of([])) };
     mockRouter = { navigate: vi.fn() };
@@ -144,76 +149,153 @@ describe('BoxesDashboard', () => {
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/boxes/new']);
   });
 
-  it('should toggle menu and stop propagation', () => {
-    const event = new MouseEvent('click');
-    vi.spyOn(event, 'stopPropagation');
+  describe('box actions', () => {
+    const host = () => fixture.nativeElement as HTMLElement;
+    const actionsButton = (name: string) =>
+      host().querySelector<HTMLButtonElement>(
+        `button[aria-haspopup="dialog"][aria-label$="${name}"]`,
+      )!;
+    const sheet = () => host().querySelector<HTMLDialogElement>('app-box-actions-sheet dialog');
+    const confirmDialog = () =>
+      host().querySelector<HTMLDialogElement>('app-confirm-dialog dialog');
+    const sheetButton = (label: string) =>
+      Array.from(sheet()!.querySelectorAll<HTMLButtonElement>('button')).find((b) =>
+        b.textContent?.trim().endsWith(label),
+      )!;
+    const confirmButton = (label: string) =>
+      Array.from(confirmDialog()!.querySelectorAll<HTMLButtonElement>('button')).find(
+        (b) => b.textContent?.trim() === label,
+      )!;
 
-    component.toggleMenu(event, '1');
-    expect(event.stopPropagation).toHaveBeenCalled();
-    expect(component.openMenuId()).toBe('1');
+    const openActionsFor = async (name: string) => {
+      actionsButton(name).click();
+      await fixture.whenStable();
+    };
+    const requestDelete = async (name: string) => {
+      await openActionsFor(name);
+      sheetButton('Eliminar').click();
+      await fixture.whenStable();
+    };
 
-    component.toggleMenu(event, '1');
-    expect(component.openMenuId()).toBeNull();
-  });
+    it('AC-1 opens the actions sheet from the three-dots button without navigating', async () => {
+      await openActionsFor('Tools');
 
-  it('should toggle to a different box', () => {
-    component.toggleMenu(new MouseEvent('click'), '1');
-    expect(component.openMenuId()).toBe('1');
+      expect(component.actionsBox()?.id).toBe('1');
+      expect(sheet()?.open).toBe(true);
+      expect(sheet()?.querySelector('h2')?.textContent?.trim()).toBe('Tools');
+      expect(mockRouter.navigate).not.toHaveBeenCalled();
+    });
 
-    component.toggleMenu(new MouseEvent('click'), '2');
-    expect(component.openMenuId()).toBe('2');
-  });
+    it('AC-4 clears the open box and does not navigate when the sheet is closed', async () => {
+      await openActionsFor('Tools');
+      sheet()!.querySelector<HTMLButtonElement>('button[aria-label="Cerrar"]')!.click();
+      await fixture.whenStable();
 
-  it('should close menu', () => {
-    component.openMenuId.set('1');
-    component.closeMenu();
-    expect(component.openMenuId()).toBeNull();
-  });
+      expect(component.actionsBox()).toBeNull();
+      expect(sheet()).toBeNull();
+      expect(mockRouter.navigate).not.toHaveBeenCalled();
+    });
 
-  it('should navigate to edit and close menu', () => {
-    component.openMenuId.set('1');
-    component.editBox('123');
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/boxes', '123', 'edit']);
-    expect(component.openMenuId()).toBeNull();
-  });
+    it.each([
+      ['Ver', ['/boxes', '1']],
+      ['Modificar', ['/boxes', '1', 'edit']],
+      ['Mover items', ['/boxes', '1', 'move-items']],
+    ])('AC-5 navigates when choosing %s', async (label, route) => {
+      await openActionsFor('Tools');
+      sheetButton(label).click();
+      await fixture.whenStable();
 
-  it('should delete a box when confirmed', () => {
-    const event = new MouseEvent('click');
-    vi.spyOn(event, 'stopPropagation');
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
-    mockBoxesService.delete.mockReturnValue(of(undefined));
+      expect(mockRouter.navigate).toHaveBeenCalledWith(route);
+      expect(component.actionsBox()).toBeNull();
+      expect(sheet()).toBeNull();
+    });
 
-    component.deleteBox(event, '1', 'Tools');
+    it('AC-6 opens the delete confirmation over the sheet with the box name and never calls window.confirm', async () => {
+      const confirmSpy = vi.spyOn(window, 'confirm');
+      await requestDelete('Tools');
 
-    expect(event.stopPropagation).toHaveBeenCalled();
-    expect(window.confirm).toHaveBeenCalledWith(
-      '¿Eliminar la caja "Tools"? Esta acción no se puede deshacer.',
-    );
-    expect(mockBoxesService.delete).toHaveBeenCalledWith('1');
-    expect(component.boxes().length).toBe(2);
-    expect(component.boxes().find((b) => b.id === '1')).toBeUndefined();
-    expect(mockNotificationService.show).toHaveBeenCalledWith('Caja "Tools" eliminada', 'success');
-    expect(component.deletingId()).toBeNull();
-    expect(component.openMenuId()).toBeNull();
-  });
+      expect(sheet()?.open).toBe(true);
+      expect(confirmDialog()?.open).toBe(true);
+      expect(confirmDialog()?.querySelector('h2')?.textContent?.trim()).toBe('¿Eliminar la caja?');
+      expect(confirmDialog()?.querySelector('p')?.textContent?.trim()).toBe(
+        'Se eliminará "Tools" y todo su contenido. Esta acción no se puede deshacer.',
+      );
+      expect(confirmSpy).not.toHaveBeenCalled();
+    });
 
-  it('should not delete a box when not confirmed', () => {
-    const event = new MouseEvent('click');
-    vi.spyOn(window, 'confirm').mockReturnValue(false);
+    it('AC-7 cancelling the confirmation keeps the actions sheet open', async () => {
+      await requestDelete('Tools');
+      confirmButton('Cancelar').click();
+      await fixture.whenStable();
 
-    component.deleteBox(event, '1', 'Tools');
+      expect(component.confirmBox()).toBeNull();
+      expect(confirmDialog()).toBeNull();
+      expect(component.actionsBox()?.id).toBe('1');
+      expect(sheet()?.open).toBe(true);
+      expect(mockBoxesService.delete).not.toHaveBeenCalled();
+    });
 
-    expect(mockBoxesService.delete).not.toHaveBeenCalled();
-    expect(component.boxes().length).toBe(3);
-  });
+    it('AC-8 confirming closes both dialogs, deletes the box and shows the notification', async () => {
+      mockBoxesService.delete.mockReturnValue(of(undefined));
+      await requestDelete('Tools');
+      confirmButton('Eliminar').click();
+      await fixture.whenStable();
 
-  it('should handle delete error', () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
-    mockBoxesService.delete.mockReturnValue(throwError(() => new Error('API error')));
+      expect(mockBoxesService.delete).toHaveBeenCalledWith('1');
+      expect(confirmDialog()).toBeNull();
+      expect(sheet()).toBeNull();
+      expect(component.boxes().find((b) => b.id === '1')).toBeUndefined();
+      expect(component.boxes().length).toBe(2);
+      expect(mockNotificationService.show).toHaveBeenCalledWith(
+        'Caja "Tools" eliminada',
+        'success',
+      );
+      expect(component.deletingId()).toBeNull();
+    });
 
-    component.deleteBox(new MouseEvent('click'), '1', 'Tools');
+    it('AC-8 disables the three-dots button and labels it as deleting while the request is pending', async () => {
+      const pending = new Subject<void>();
+      mockBoxesService.delete.mockReturnValue(pending);
+      await requestDelete('Tools');
+      confirmButton('Eliminar').click();
+      await fixture.whenStable();
 
-    expect(mockBoxesService.delete).toHaveBeenCalledWith('1');
-    expect(component.deletingId()).toBeNull();
+      const button = actionsButton('Tools…');
+      expect(component.deletingId()).toBe('1');
+      expect(button.getAttribute('aria-label')).toBe('Eliminando Tools…');
+      expect(button.getAttribute('aria-disabled')).toBe('true');
+
+      button.click();
+      await fixture.whenStable();
+      expect(sheet()).toBeNull();
+      expect(mockRouter.navigate).not.toHaveBeenCalled();
+
+      pending.next();
+      pending.complete();
+      await fixture.whenStable();
+      expect(actionsButton('Books').getAttribute('aria-disabled')).toBeNull();
+    });
+
+    it('AC-9 keeps the box and clears the deleting state when delete fails', async () => {
+      mockBoxesService.delete.mockReturnValue(throwError(() => new Error('API error')));
+      await requestDelete('Tools');
+      confirmButton('Eliminar').click();
+      await fixture.whenStable();
+
+      expect(mockBoxesService.delete).toHaveBeenCalledWith('1');
+      expect(component.deletingId()).toBeNull();
+      expect(component.boxes().length).toBe(3);
+      expect(mockNotificationService.show).not.toHaveBeenCalled();
+    });
+
+    it('AC-10 returns focus to the three-dots button when the sheet closes', async () => {
+      const trigger = actionsButton('Tools');
+      trigger.focus();
+      await openActionsFor('Tools');
+      sheet()!.querySelector<HTMLButtonElement>('button[aria-label="Cerrar"]')!.click();
+      await fixture.whenStable();
+
+      expect(document.activeElement).toBe(trigger);
+    });
   });
 });
