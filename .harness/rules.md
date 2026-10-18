@@ -33,6 +33,8 @@ Adapts the harness base rules (SOLID, `implementation-rules.md`, ids `B-*`) to t
 - P-004 Specs that render a `<dialog>` call `installDialogStub()` from `src/testing/dialog-stub.ts` in `beforeEach` and restore it in `afterEach` (jsdom has no `showModal`/`close`) | Reason: one shared stub (D-020 of INV-001) | Source: user, implement INV-001 | Date: 2026-10-18
 - P-005 Commits carry no `Co-Authored-By` or other AI attribution/session trailers; one commit per plan step is expected (B-H1) | Reason: the user does not want the AI as co-author | Source: user, implement INV-001 | Date: 2026-10-18
 
+- P-006 New modals are native `<dialog appModalDialog>` (`src/app/shared/dialog/modal-dialog.ts`): it owns showModal, Escape/backdrop dismissal and the animated close; components do not reimplement that lifecycle. Reuse `ConfirmDialog` for confirmations instead of `window.confirm` | Reason: duplicated lifecycle caused review findings R-1..R-3/R-6 in INV-001 | Source: user, review-code INV-001 | Date: 2026-10-18
+
 ## Stack checklist
 - Angular: no manual subscriptions left open in components that outlive the request; signals updated immutably.
 - Tailwind: no hard-coded colours (hex/rgb) in templates; use theme tokens.
