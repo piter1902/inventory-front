@@ -24,10 +24,12 @@ providers: claude-code-review    # claude-code-review | harness (comma-separated
 base: main                       # branch the diff is taken against
 claude-code-review-level: high   # low | medium | high | xhigh | max
 
+## PR
+
+provider: github                 # github | azure-devops | manual
+target: main                     # branch the PR is opened against
+
 ## Security review
 
 base: main                       # branch the diff is taken against
-runner: claude-cli               # claude-cli | codex-cli | subagent
-verifier-runner: same            # same | claude-cli | codex-cli | subagent
-extra: none                      # claude-security-review | none (headless /security-review returns empty in Claude Code 2.1.302)
 lenses: all                      # all | comma-separated list of lenses
