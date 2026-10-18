@@ -1,0 +1,60 @@
+<dialog
+  appModalDialog
+  class="dialog-sheet mt-auto mb-0 mx-0 w-full max-w-none max-h-dvh overflow-y-auto p-0 border-0 rounded-t-[28px] bg-surface-container-lowest text-on-surface shadow-xl backdrop:bg-primary/45 md:m-auto md:max-w-[400px] md:max-h-[calc(100dvh-2rem)] md:rounded-[28px]"
+  [attr.aria-labelledby]="titleId"
+  (dismissed)="close()"
+>
+  <div class="flex flex-col pb-[calc(2rem+env(safe-area-inset-bottom))] md:pt-2 md:pb-4">
+    <div class="flex justify-center pt-2.5 pb-1 md:hidden" aria-hidden="true">
+      <span class="w-10 h-1 rounded-full bg-outline-variant"></span>
+    </div>
+
+    <div class="flex items-start gap-2 pl-6 pr-2 pt-2 pb-3">
+      <div class="flex-1 min-w-0 pt-1.5">
+        <h2 [id]="titleId" class="text-headline-md text-primary line-clamp-2 break-words">
+          {{ box().name }}
+        </h2>
+        @if (box().identifier) {
+          <p class="text-label-sm text-on-surface-variant" data-testid="box-identifier">
+            {{ box().identifier }}
+          </p>
+        }
+      </div>
+      <button
+        type="button"
+        class="size-11 shrink-0 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        aria-label="Cerrar"
+        (click)="close()"
+      >
+        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+      </button>
+    </div>
+
+    <div class="pt-1">
+      @for (action of actions; track action.label) {
+        <button
+          type="button"
+          data-action
+          [attr.autofocus]="$first ? '' : null"
+          class="w-full min-h-13 flex items-center gap-4 px-6 py-3.5 text-left text-label-md text-on-surface hover:bg-surface-container-high transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+          (click)="choose(action.emitter)"
+        >
+          <span class="material-symbols-outlined text-on-surface-variant" aria-hidden="true">{{
+            action.icon
+          }}</span>
+          {{ action.label }}
+        </button>
+      }
+      <div class="h-px mx-6 my-1 bg-outline-variant/60"></div>
+      <button
+        type="button"
+        data-action
+        class="w-full min-h-13 flex items-center gap-4 px-6 py-3.5 text-left text-label-md text-error hover:bg-error-container/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+        (click)="requestDelete()"
+      >
+        <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+        Eliminar
+      </button>
+    </div>
+  </div>
+</dialog>

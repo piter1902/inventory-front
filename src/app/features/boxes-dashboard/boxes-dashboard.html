@@ -1,5 +1,9 @@
-<main class="px-container-padding-mobile md:px-container-padding-desktop pt-stack-md max-w-7xl mx-auto">
-  <div class="mb-stack-lg sticky top-16 bg-surface-bright/80 md:backdrop-blur-md py-4 z-30 flex items-center gap-4">
+<main
+  class="px-container-padding-mobile md:px-container-padding-desktop pt-stack-md max-w-7xl mx-auto"
+>
+  <div
+    class="mb-stack-lg sticky top-16 bg-surface-bright/80 md:backdrop-blur-md py-4 z-30 flex items-center gap-4"
+  >
     <div class="relative group flex-1">
       <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
         <span class="material-symbols-outlined text-outline leading-none">search</span>
@@ -8,7 +12,8 @@
         class="w-full h-14 pl-12 pr-4 bg-surface-container rounded-xl focus:ring-2 focus:outline-none focus:bg-surface-container-lowest transition-all text-body-md text-on-surface placeholder:text-outline shadow-sm"
         placeholder="Buscar en el inventario..."
         type="text"
-        (input)="onSearch($event)"/>
+        (input)="onSearch($event)"
+      />
     </div>
     <app-create-button label="Nueva caja" (pressed)="onCreateBox()" />
   </div>
@@ -28,11 +33,14 @@
     @for (box of filteredBoxes; track box.id) {
       <div
         class="bg-surface-container-lowest rounded-3xl shadow-sm hover:shadow-md transition-all group border border-outline-variant/20 active:scale-[0.98] cursor-pointer"
-        (click)="openBox(box.id)">
+        (click)="openBox(box.id)"
+      >
         <div class="h-40 w-full relative overflow-hidden rounded-t-3xl bg-surface-container-high">
           <app-box-image [boxId]="box.id" [hasImage]="box.hasImage" [alt]="box.name" />
           @if (box.identifier) {
-            <div class="absolute top-3 left-3 bg-primary/90 text-on-primary px-3 py-1 rounded-full text-label-sm font-bold backdrop-blur-sm">
+            <div
+              class="absolute top-3 left-3 bg-primary/90 text-on-primary px-3 py-1 rounded-full text-label-sm font-bold backdrop-blur-sm"
+            >
               {{ box.identifier }}
             </div>
           }
@@ -40,56 +48,79 @@
         <div class="p-4">
           <h3 class="text-headline-md text-headline-md text-primary mb-1">{{ box.name }}</h3>
           @if (box.description) {
-            <p class="text-label-sm text-label-sm text-on-surface-variant line-clamp-2 mb-2">{{ box.description }}</p>
+            <p class="text-label-sm text-label-sm text-on-surface-variant line-clamp-2 mb-2">
+              {{ box.description }}
+            </p>
           }
           <div class="flex items-center gap-2 text-on-surface-variant">
-            <span class="material-symbols-outlined text-body-md" style="font-variation-settings: 'opsz' 20">inventory_2</span>
+            <span
+              class="material-symbols-outlined text-body-md"
+              style="font-variation-settings: 'opsz' 20"
+              >inventory_2</span
+            >
             <span class="text-label-md">{{ (box.items || []).length }} items</span>
           </div>
           @if (zoneName(box.zoneId); as zName) {
-            <a [routerLink]="['/zones', box.zoneId]" class="inline-flex items-center gap-1 mt-2 text-label-sm text-label-sm text-secondary hover:underline" (click)="$event.stopPropagation()">
+            <a
+              [routerLink]="['/zones', box.zoneId]"
+              class="inline-flex items-center gap-1 mt-2 text-label-sm text-label-sm text-secondary hover:underline"
+              (click)="$event.stopPropagation()"
+            >
               <span class="material-symbols-outlined text-[14px]">shelves</span>
               {{ zName }}
             </a>
           }
           <div class="mt-4 flex items-center justify-between">
-            <span class="bg-secondary-container/30 text-on-secondary-container px-3 py-1 rounded-lg text-label-sm">{{ box.identifier }}</span>
-            <div class="relative">
-              <button class="flex items-center justify-center w-8 h-8 text-on-surface-variant hover:text-primary transition-colors active:scale-90" (click)="toggleMenu($event, box.id)">
-                @if (deletingId() === box.id) {
-                  <span class="material-symbols-outlined animate-spin text-sm">progress_activity</span>
-                } @else {
-                  <span class="material-symbols-outlined">more_vert</span>
-                }
-              </button>
-              @if (openMenuId() === box.id) {
-                <!-- backdrop -->
-                <div class="fixed inset-0 z-40" (click)="$event.stopPropagation(); closeMenu()"></div>
-                <!-- menu -->
-                <div class="absolute right-0 top-10 z-50 bg-surface-container-lowest rounded-xl shadow-lg border border-outline-variant/30 py-2 min-w-40 overflow-hidden" (click)="$event.stopPropagation()">
-                  <button class="w-full flex items-center gap-3 px-4 py-3 text-on-surface hover:bg-surface-container-high transition-colors text-label-md" (click)="openBox(box.id); closeMenu()">
-                    <span class="material-symbols-outlined text-[20px]">visibility</span>
-                    Ver
-                  </button>
-                  <button class="w-full flex items-center gap-3 px-4 py-3 text-on-surface hover:bg-surface-container-high transition-colors text-label-md" (click)="editBox(box.id)">
-                    <span class="material-symbols-outlined text-[20px]">edit</span>
-                    Modificar
-                  </button>
-                  <button class="w-full flex items-center gap-3 px-4 py-3 text-on-surface hover:bg-surface-container-high transition-colors text-label-md" (click)="moveItemsFromBox(box.id)">
-                    <span class="material-symbols-outlined text-[20px]">drive_file_move</span>
-                    Mover items
-                  </button>
-                  <div class="h-px bg-outline-variant/30 my-1"></div>
-                  <button class="w-full flex items-center gap-3 px-4 py-3 text-error hover:bg-error-container/20 transition-colors text-label-md" (click)="deleteBox($event, box.id, box.name)">
-                    <span class="material-symbols-outlined text-[20px]">delete</span>
-                    Eliminar
-                  </button>
-                </div>
+            <span
+              class="bg-secondary-container/30 text-on-secondary-container px-3 py-1 rounded-lg text-label-sm"
+              >{{ box.identifier }}</span
+            >
+            <!-- aria-disabled instead of disabled: a disabled button would let the click reach the card and navigate. -->
+            <button
+              type="button"
+              class="flex items-center justify-center size-11 -mr-2 rounded-full text-on-surface-variant hover:text-primary transition-colors active:scale-90 aria-disabled:cursor-default aria-disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              aria-haspopup="dialog"
+              [attr.aria-label]="
+                isDeleting(box.id) ? 'Eliminando ' + box.name + '…' : 'Acciones de ' + box.name
+              "
+              [attr.aria-disabled]="isDeleting(box.id) ? 'true' : null"
+              (click)="openActions($event, box)"
+            >
+              @if (isDeleting(box.id)) {
+                <span class="material-symbols-outlined animate-spin text-sm" aria-hidden="true"
+                  >progress_activity</span
+                >
+              } @else {
+                <span class="material-symbols-outlined" aria-hidden="true">more_vert</span>
               }
-            </div>
+            </button>
           </div>
         </div>
       </div>
     }
   </div>
+
+  <!-- @for tracked by opening key: each opening creates a new dialog; a new opening replaces a
+       dialog that is still animating out instead of reusing it. -->
+  @for (opening of actionsSheetOpenings(); track opening.key) {
+    <app-box-actions-sheet
+      [box]="opening.box"
+      (view)="openBox(opening.box.id)"
+      (edit)="editBox(opening.box.id)"
+      (moveItems)="moveItemsFromBox(opening.box.id)"
+      (deleteRequested)="requestDelete(opening.box)"
+      (closed)="closeActions(opening.key)"
+    />
+  }
+
+  @for (opening of confirmOpenings(); track opening.key) {
+    <app-confirm-dialog
+      title="¿Eliminar la caja?"
+      [message]="deleteMessage(opening.box.name)"
+      confirmLabel="Eliminar"
+      [destructive]="true"
+      (confirmed)="confirmDelete(opening.box)"
+      (closed)="closeConfirmation(opening.key)"
+    />
+  }
 </main>

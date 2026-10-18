@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
@@ -123,16 +123,22 @@
   --color-tertiary: #c0c4e8;
   --color-tertiary-container: #2a2e42;
   --color-error: #ffb4ab;
+  --color-on-error: #690005;
   --color-error-container: #93000a;
   --color-on-error-container: #ffdad6;
 }
 
 @layer base {
   * {
-    transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease,
+      border-color 200ms ease,
+      box-shadow 200ms ease;
   }
 
-  html, body {
+  html,
+  body {
     font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -141,14 +147,128 @@
     min-height: 100dvh;
   }
 
-  button { cursor: pointer; }
-  input, textarea { font-family: inherit; }
+  button {
+    cursor: pointer;
+  }
+  input,
+  textarea {
+    font-family: inherit;
+  }
 }
 
 .material-symbols-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
   user-select: none;
   vertical-align: middle;
+}
+
+/* Modal dialogs: lock page scroll while one is open; the stable gutter keeps the
+   layout from shifting when the scrollbar disappears. */
+html:has(dialog[open]) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
+/* Dialog motion. .dialog-pop fades and scales; .dialog-sheet slides from the bottom
+   below md. Entry transitions live on [open] with @starting-style as the entry state. */
+dialog.dialog-pop,
+dialog.dialog-sheet {
+  opacity: 0;
+  transform: scale(0.96);
+}
+
+dialog.dialog-pop[open],
+dialog.dialog-sheet[open] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 150ms ease-out,
+    transform 150ms ease-out;
+}
+
+@starting-style {
+  dialog.dialog-pop[open],
+  dialog.dialog-sheet[open] {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+dialog:is(.dialog-pop, .dialog-sheet)::backdrop {
+  opacity: 0;
+}
+
+dialog:is(.dialog-pop, .dialog-sheet)[open]::backdrop {
+  opacity: 1;
+  transition: opacity 200ms ease-out;
+}
+
+@starting-style {
+  dialog:is(.dialog-pop, .dialog-sheet)[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+@media (width < 48rem) {
+  dialog.dialog-sheet {
+    opacity: 1;
+    transform: translateY(100%);
+  }
+
+  dialog.dialog-sheet[open] {
+    transform: none;
+    transition: transform 250ms cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  @starting-style {
+    dialog.dialog-sheet[open] {
+      opacity: 1;
+      transform: translateY(100%);
+    }
+  }
+}
+
+/* Exit transitions keep the closed dialog in the top layer via `overlay`. Without it
+   (e.g. Firefox) the dialog would drop into the page flow mid-animation, so there it
+   simply closes without one. */
+@supports (overlay: auto) {
+  dialog.dialog-pop,
+  dialog.dialog-sheet {
+    transition:
+      opacity 150ms ease-out,
+      transform 150ms ease-out,
+      overlay 150ms ease-out allow-discrete,
+      display 150ms ease-out allow-discrete;
+  }
+
+  dialog:is(.dialog-pop, .dialog-sheet)::backdrop {
+    transition:
+      opacity 200ms ease-out,
+      overlay 200ms allow-discrete,
+      display 200ms allow-discrete;
+  }
+
+  @media (width < 48rem) {
+    dialog.dialog-sheet {
+      transition:
+        transform 200ms cubic-bezier(0.3, 0, 1, 1),
+        overlay 200ms allow-discrete,
+        display 200ms allow-discrete;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog:is(.dialog-pop, .dialog-sheet),
+  dialog:is(.dialog-pop, .dialog-sheet)[open],
+  dialog:is(.dialog-pop, .dialog-sheet)::backdrop,
+  dialog:is(.dialog-pop, .dialog-sheet)[open]::backdrop {
+    transition: none;
+  }
 }
 
 .nav-active {
