@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ConfirmDialog } from './confirm-dialog';
-import { installDialogStub } from '../../../testing/dialog-stub';
+import { clickBackdrop, installDialogStub } from '../../../testing/dialog-stub';
 
 describe('ConfirmDialog', () => {
   const message = 'Se eliminará "Tools" y todo su contenido. Esta acción no se puede deshacer.';
@@ -53,18 +53,28 @@ describe('ConfirmDialog', () => {
     expect(confirm.hasAttribute('autofocus')).toBe(false);
   });
 
+  it('should never grow past the viewport and scroll inside instead', () => {
+    expect(dialog.classList).toContain('max-h-[calc(100dvh-3rem)]');
+    expect(dialog.classList).toContain('overflow-y-auto');
+  });
+
   it('should style the confirm button as destructive', () => {
     const confirm = buttons()[1];
     expect(confirm.classList).toContain('bg-error');
     expect(confirm.classList).toContain('text-on-error');
   });
 
-  it('should close and emit confirmed when confirming', async () => {
-    buttons()[1].click();
-    await fixture.whenStable();
+  it('should emit confirmed at once and closed after the exit animation', async () => {
+    const closed = vi.fn<() => void>();
+    fixture.componentInstance.closed.subscribe(closed);
 
-    expect(dialog.open).toBe(false);
+    buttons()[1].click();
     expect(confirmed).toHaveBeenCalledTimes(1);
+    expect(closed).not.toHaveBeenCalled();
+
+    await fixture.whenStable();
+    expect(dialog.open).toBe(false);
+    expect(closed).toHaveBeenCalledTimes(1);
     expect(cancelled).not.toHaveBeenCalled();
   });
 
@@ -82,7 +92,7 @@ describe('ConfirmDialog', () => {
     await fixture.whenStable();
     expect(cancelled).not.toHaveBeenCalled();
 
-    dialog.click();
+    clickBackdrop(dialog);
     await fixture.whenStable();
     expect(cancelled).toHaveBeenCalledTimes(1);
   });

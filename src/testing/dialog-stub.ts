@@ -20,3 +20,9 @@ export function installDialogStub(): () => void {
     proto.close = close;
   };
 }
+
+/** A press and click on the ::backdrop, which browsers dispatch to the <dialog> itself. */
+export function clickBackdrop(dialog: HTMLDialogElement): void {
+  dialog.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+  dialog.click();
+}

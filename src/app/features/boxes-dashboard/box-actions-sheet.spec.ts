@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BoxActionsSheet } from './box-actions-sheet';
 import { BoxSummary } from '../../models/box.models';
-import { installDialogStub } from '../../../testing/dialog-stub';
+import { clickBackdrop, installDialogStub } from '../../../testing/dialog-stub';
 
 describe('BoxActionsSheet', () => {
   const box: BoxSummary = {
@@ -51,6 +51,22 @@ describe('BoxActionsSheet', () => {
     expect(dialog.classList).toContain('md:rounded-[28px]');
   });
 
+  it('AC-2 never grows past the viewport and scrolls inside instead', () => {
+    expect(dialog.classList).toContain('max-h-dvh');
+    expect(dialog.classList).toContain('md:max-h-[calc(100dvh-2rem)]');
+    expect(dialog.classList).toContain('overflow-y-auto');
+  });
+
+  it('should run an action only once when it is tapped twice while closing', async () => {
+    const edit = spyOn('edit');
+    actionButtons()[1].click();
+    actionButtons()[1].click();
+    closeButton().click();
+    await fixture.whenStable();
+
+    expect(edit).toHaveBeenCalledTimes(1);
+  });
+
   it('AC-3 shows the box name and identifier in the header', () => {
     expect(dialog.querySelector('h2')?.textContent?.trim()).toBe('Tools');
     expect(dialog.textContent).toContain('BOX-001');
@@ -89,7 +105,7 @@ describe('BoxActionsSheet', () => {
     await fixture.whenStable();
     expect(closed).not.toHaveBeenCalled();
 
-    dialog.click();
+    clickBackdrop(dialog);
     await fixture.whenStable();
     expect(closed).toHaveBeenCalledTimes(1);
   });
@@ -128,17 +144,30 @@ describe('BoxActionsSheet', () => {
     expect(dialog.open).toBe(true);
   });
 
+  it('should ignore Eliminar once the sheet has started closing', async () => {
+    const deleteRequested = spyOn('deleteRequested');
+    const view = spyOn('view');
+    actionButtons()[0].click();
+    actionButtons()[3].click();
+    await fixture.whenStable();
+
+    expect(view).toHaveBeenCalledTimes(1);
+    expect(deleteRequested).not.toHaveBeenCalled();
+  });
+
   it('should close and emit closed when closed by its parent', async () => {
     const closed = spyOn('closed');
-    await fixture.componentInstance.close();
+    fixture.componentInstance.close();
+    await fixture.whenStable();
 
     expect(dialog.open).toBe(false);
     expect(closed).toHaveBeenCalledTimes(1);
   });
 
-  it('AC-10 exposes role, aria-modal and the box name as accessible name', () => {
-    expect(dialog.getAttribute('role')).toBe('dialog');
-    expect(dialog.getAttribute('aria-modal')).toBe('true');
+  it('AC-10 is a native modal dialog named after the box', () => {
+    // A <dialog> opened with showModal() already exposes role=dialog and modality.
+    expect(dialog.tagName).toBe('DIALOG');
+    expect(dialog.hasAttribute('role')).toBe(false);
     expect(
       document.getElementById(dialog.getAttribute('aria-labelledby')!)?.textContent?.trim(),
     ).toBe('Tools');

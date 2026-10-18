@@ -1,11 +1,8 @@
 <dialog
-  #dialog
-  class="dialog-sheet mt-auto mb-0 mx-0 w-full max-w-none max-h-none p-0 border-0 rounded-t-[28px] bg-surface-container-lowest text-on-surface shadow-xl backdrop:bg-primary/45 md:m-auto md:max-w-[400px] md:rounded-[28px]"
-  role="dialog"
-  aria-modal="true"
+  appModalDialog
+  class="dialog-sheet mt-auto mb-0 mx-0 w-full max-w-none max-h-dvh overflow-y-auto p-0 border-0 rounded-t-[28px] bg-surface-container-lowest text-on-surface shadow-xl backdrop:bg-primary/45 md:m-auto md:max-w-[400px] md:max-h-[calc(100dvh-2rem)] md:rounded-[28px]"
   [attr.aria-labelledby]="titleId"
-  (cancel)="onCancelEvent($event)"
-  (click)="onDialogClick($event)"
+  (dismissed)="close()"
 >
   <div class="flex flex-col pb-[calc(2rem+env(safe-area-inset-bottom))] md:pt-2 md:pb-4">
     <div class="flex justify-center pt-2.5 pb-1 md:hidden" aria-hidden="true">
@@ -53,7 +50,7 @@
         type="button"
         data-action
         class="w-full min-h-13 flex items-center gap-4 px-6 py-3.5 text-left text-label-md text-error hover:bg-error-container/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
-        (click)="deleteRequested.emit()"
+        (click)="requestDelete()"
       >
         <span class="material-symbols-outlined" aria-hidden="true">delete</span>
         Eliminar

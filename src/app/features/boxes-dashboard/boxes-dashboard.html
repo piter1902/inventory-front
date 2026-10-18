@@ -81,12 +81,12 @@
               class="flex items-center justify-center size-11 -mr-2 rounded-full text-on-surface-variant hover:text-primary transition-colors active:scale-90 aria-disabled:cursor-default aria-disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               aria-haspopup="dialog"
               [attr.aria-label]="
-                deletingId() === box.id ? 'Eliminando ' + box.name + '…' : 'Acciones de ' + box.name
+                isDeleting(box.id) ? 'Eliminando ' + box.name + '…' : 'Acciones de ' + box.name
               "
-              [attr.aria-disabled]="deletingId() === box.id ? 'true' : null"
+              [attr.aria-disabled]="isDeleting(box.id) ? 'true' : null"
               (click)="openActions($event, box)"
             >
-              @if (deletingId() === box.id) {
+              @if (isDeleting(box.id)) {
                 <span class="material-symbols-outlined animate-spin text-sm" aria-hidden="true"
                   >progress_activity</span
                 >
@@ -100,25 +100,27 @@
     }
   </div>
 
-  @if (actionsBox(); as box) {
+  <!-- @for tracked by opening key: each opening creates a new dialog; a new opening replaces a
+       dialog that is still animating out instead of reusing it. -->
+  @for (opening of actionsSheetOpenings(); track opening.key) {
     <app-box-actions-sheet
-      [box]="box"
-      (view)="openBox(box.id)"
-      (edit)="editBox(box.id)"
-      (moveItems)="moveItemsFromBox(box.id)"
-      (deleteRequested)="confirmBox.set(box)"
-      (closed)="closeActions()"
+      [box]="opening.box"
+      (view)="openBox(opening.box.id)"
+      (edit)="editBox(opening.box.id)"
+      (moveItems)="moveItemsFromBox(opening.box.id)"
+      (deleteRequested)="requestDelete(opening.box)"
+      (closed)="closeActions(opening.key)"
     />
   }
 
-  @if (confirmBox(); as box) {
+  @for (opening of confirmOpenings(); track opening.key) {
     <app-confirm-dialog
       title="¿Eliminar la caja?"
-      [message]="deleteMessage(box.name)"
+      [message]="deleteMessage(opening.box.name)"
       confirmLabel="Eliminar"
       [destructive]="true"
-      (confirmed)="confirmDelete(box)"
-      (cancelled)="confirmBox.set(null)"
+      (confirmed)="confirmDelete(opening.box)"
+      (closed)="closeConfirmation(opening.key)"
     />
   }
 </main>

@@ -1,34 +1,25 @@
-import {
-  afterNextRender,
-  Component,
-  DestroyRef,
-  ElementRef,
-  inject,
-  input,
-  output,
-  PendingTasks,
-  viewChild,
-} from '@angular/core';
-import { closeDialog } from '../dialog/close-dialog';
+import { Component, input, output, viewChild } from '@angular/core';
+import { ModalDialog } from '../dialog/modal-dialog';
 
 let nextId = 0;
 
 /**
- * Modal confirmation built on the native <dialog> (alertdialog). It opens as soon as it is rendered;
- * the parent removes it after `confirmed` or `cancelled`, which fire once the exit animation ends.
+ * Modal confirmation built on the native <dialog> (alertdialog). It opens as soon as it is rendered.
+ * `confirmed` / `cancelled` fire as soon as the user decides, so the parent can react while this
+ * dialog animates out; `closed` fires once the exit animation ends, when the parent removes it.
  */
 @Component({
   selector: 'app-confirm-dialog',
+  imports: [ModalDialog],
   template: `
     <dialog
-      #dialog
-      class="dialog-pop m-auto w-[calc(100%-3rem)] max-w-[400px] max-h-none p-0 border-0 rounded-[28px] bg-surface-container-lowest text-on-surface shadow-xl backdrop:bg-primary/32"
+      appModalDialog
+      class="dialog-pop m-auto w-[calc(100%-3rem)] max-w-[400px] max-h-[calc(100dvh-3rem)] overflow-y-auto p-0 border-0 rounded-[28px] bg-surface-container-lowest text-on-surface shadow-xl backdrop:bg-primary/32"
       role="alertdialog"
       aria-modal="true"
       [attr.aria-labelledby]="titleId"
       [attr.aria-describedby]="messageId"
-      (cancel)="onCancelEvent($event)"
-      (click)="onDialogClick($event)"
+      (dismissed)="cancel()"
     >
       <div class="flex flex-col gap-4 p-6 pb-5">
         <h2 [id]="titleId" class="text-headline-md text-primary">{{ title() }}</h2>
@@ -62,10 +53,7 @@ let nextId = 0;
   host: { class: 'contents' },
 })
 export class ConfirmDialog {
-  private readonly pendingTasks = inject(PendingTasks);
-  private readonly dialog = viewChild.required<ElementRef<HTMLDialogElement>>('dialog');
-  private closing = false;
-  private destroyed = false;
+  private readonly modal = viewChild.required(ModalDialog);
 
   readonly title = input.required<string>();
   readonly message = input.required<string>();
@@ -75,42 +63,16 @@ export class ConfirmDialog {
 
   readonly confirmed = output<void>();
   readonly cancelled = output<void>();
+  readonly closed = output<void>();
 
   protected readonly titleId = `confirm-dialog-title-${nextId}`;
   protected readonly messageId = `confirm-dialog-message-${nextId++}`;
 
-  constructor() {
-    inject(DestroyRef).onDestroy(() => (this.destroyed = true));
-    afterNextRender(() => this.dialog().nativeElement.showModal());
-  }
-
   protected confirm(): void {
-    this.closeThen(() => this.confirmed.emit());
+    if (this.modal().close(() => this.closed.emit())) this.confirmed.emit();
   }
 
   protected cancel(): void {
-    this.closeThen(() => this.cancelled.emit());
-  }
-
-  protected onCancelEvent(event: Event): void {
-    event.preventDefault();
-    this.cancel();
-  }
-
-  /** Clicks on the ::backdrop are dispatched to the <dialog> itself. */
-  protected onDialogClick(event: MouseEvent): void {
-    if (event.target === this.dialog().nativeElement) this.cancel();
-  }
-
-  private async closeThen(emit: () => void): Promise<void> {
-    if (this.closing) return;
-    this.closing = true;
-    const taskDone = this.pendingTasks.add();
-    try {
-      await closeDialog(this.dialog().nativeElement);
-      if (!this.destroyed) emit();
-    } finally {
-      taskDone();
-    }
+    if (this.modal().close(() => this.closed.emit())) this.cancelled.emit();
   }
 }

@@ -180,7 +180,7 @@ describe('BoxesDashboard', () => {
     it('AC-1 opens the actions sheet from the three-dots button without navigating', async () => {
       await openActionsFor('Tools');
 
-      expect(component.actionsBox()?.id).toBe('1');
+      expect(component.actionsOpening()?.box.id).toBe('1');
       expect(sheet()?.open).toBe(true);
       expect(sheet()?.querySelector('h2')?.textContent?.trim()).toBe('Tools');
       expect(mockRouter.navigate).not.toHaveBeenCalled();
@@ -191,7 +191,7 @@ describe('BoxesDashboard', () => {
       sheet()!.querySelector<HTMLButtonElement>('button[aria-label="Cerrar"]')!.click();
       await fixture.whenStable();
 
-      expect(component.actionsBox()).toBeNull();
+      expect(component.actionsOpening()).toBeNull();
       expect(sheet()).toBeNull();
       expect(mockRouter.navigate).not.toHaveBeenCalled();
     });
@@ -206,8 +206,29 @@ describe('BoxesDashboard', () => {
       await fixture.whenStable();
 
       expect(mockRouter.navigate).toHaveBeenCalledWith(route);
-      expect(component.actionsBox()).toBeNull();
+      expect(component.actionsOpening()).toBeNull();
       expect(sheet()).toBeNull();
+    });
+
+    it('AC-1 opens another box while the previous sheet is still closing', async () => {
+      await openActionsFor('Tools');
+      sheet()!.querySelector<HTMLButtonElement>('button[aria-label="Cerrar"]')!.click();
+      actionsButton('Books').click();
+      await fixture.whenStable();
+
+      expect(component.actionsOpening()?.box.id).toBe('2');
+      expect(sheet()?.open).toBe(true);
+      expect(sheet()?.querySelector('h2')?.textContent?.trim()).toBe('Books');
+    });
+
+    it('AC-1 reopens the same box while its sheet is still closing', async () => {
+      await openActionsFor('Tools');
+      sheet()!.querySelector<HTMLButtonElement>('button[aria-label="Cerrar"]')!.click();
+      actionsButton('Tools').click();
+      await fixture.whenStable();
+
+      expect(component.actionsOpening()?.box.id).toBe('1');
+      expect(sheet()?.open).toBe(true);
     });
 
     it('AC-6 opens the delete confirmation over the sheet with the box name and never calls window.confirm', async () => {
@@ -228,11 +249,35 @@ describe('BoxesDashboard', () => {
       confirmButton('Cancelar').click();
       await fixture.whenStable();
 
-      expect(component.confirmBox()).toBeNull();
+      expect(component.confirmOpening()).toBeNull();
       expect(confirmDialog()).toBeNull();
-      expect(component.actionsBox()?.id).toBe('1');
+      expect(component.actionsOpening()?.box.id).toBe('1');
       expect(sheet()?.open).toBe(true);
       expect(mockBoxesService.delete).not.toHaveBeenCalled();
+    });
+
+    it('AC-6 asks again when Eliminar is pressed while the cancelled confirmation is still closing', async () => {
+      await requestDelete('Tools');
+      confirmButton('Cancelar').click();
+      sheetButton('Eliminar').click();
+      await fixture.whenStable();
+
+      expect(component.confirmOpening()?.box.id).toBe('1');
+      expect(confirmDialog()?.open).toBe(true);
+    });
+
+    it('AC-8 starts closing the sheet as soon as the delete is confirmed, so it ignores further actions', async () => {
+      mockBoxesService.delete.mockReturnValue(new Subject<void>());
+      await requestDelete('Tools');
+      confirmButton('Eliminar').click();
+
+      expect(mockBoxesService.delete).toHaveBeenCalledWith('1');
+      sheetButton('Ver').click();
+      await fixture.whenStable();
+
+      expect(mockRouter.navigate).not.toHaveBeenCalled();
+      expect(sheet()).toBeNull();
+      expect(confirmDialog()).toBeNull();
     });
 
     it('AC-8 confirming closes both dialogs, deletes the box and shows the notification', async () => {
@@ -250,7 +295,7 @@ describe('BoxesDashboard', () => {
         'Caja "Tools" eliminada',
         'success',
       );
-      expect(component.deletingId()).toBeNull();
+      expect(component.isDeleting('1')).toBe(false);
     });
 
     it('AC-8 disables the three-dots button and labels it as deleting while the request is pending', async () => {
@@ -261,7 +306,7 @@ describe('BoxesDashboard', () => {
       await fixture.whenStable();
 
       const button = actionsButton('Tools…');
-      expect(component.deletingId()).toBe('1');
+      expect(component.isDeleting('1')).toBe(true);
       expect(button.getAttribute('aria-label')).toBe('Eliminando Tools…');
       expect(button.getAttribute('aria-disabled')).toBe('true');
 
@@ -276,6 +321,80 @@ describe('BoxesDashboard', () => {
       expect(actionsButton('Books').getAttribute('aria-disabled')).toBeNull();
     });
 
+    it('AC-8 keeps each box busy until its own delete finishes when several run at once', async () => {
+      const toolsDelete = new Subject<void>();
+      const booksDelete = new Subject<void>();
+      mockBoxesService.delete.mockImplementation((id: string) =>
+        id === '1' ? toolsDelete : booksDelete,
+      );
+      for (const name of ['Tools', 'Books']) {
+        await requestDelete(name);
+        confirmButton('Eliminar').click();
+        await fixture.whenStable();
+      }
+      expect(component.isDeleting('1')).toBe(true);
+      expect(component.isDeleting('2')).toBe(true);
+
+      toolsDelete.next();
+      toolsDelete.complete();
+      await fixture.whenStable();
+
+      expect(component.isDeleting('2')).toBe(true);
+      expect(actionsButton('Books…').getAttribute('aria-disabled')).toBe('true');
+      actionsButton('Books…').click();
+      await fixture.whenStable();
+      expect(sheet()).toBeNull();
+    });
+
+    it('AC-8 still notifies when the user left the dashboard before the delete finished', async () => {
+      const pending = new Subject<void>();
+      mockBoxesService.delete.mockReturnValue(pending);
+      await requestDelete('Tools');
+      confirmButton('Eliminar').click();
+      await fixture.whenStable();
+      fixture.destroy();
+
+      expect(() => {
+        pending.next();
+        pending.complete();
+      }).not.toThrow();
+      expect(mockNotificationService.show).toHaveBeenCalledWith(
+        'Caja "Tools" eliminada',
+        'success',
+      );
+    });
+
+    it('AC-10 moves focus next to each removed box when several deletes finish together', async () => {
+      const extra: BoxSummary = {
+        ...mockBoxes[1],
+        id: '4',
+        identifier: 'BOX-004',
+        name: 'Kitchen',
+      };
+      component.boxes.set([...mockBoxes, extra]);
+      await fixture.whenStable();
+      const deletes = new Map([
+        ['1', new Subject<void>()],
+        ['3', new Subject<void>()],
+      ]);
+      mockBoxesService.delete.mockImplementation((id: string) => deletes.get(id)!);
+      for (const name of ['Tools', 'Toolshed']) {
+        await requestDelete(name);
+        confirmButton('Eliminar').click();
+        await fixture.whenStable();
+      }
+      (document.activeElement as HTMLElement | null)?.blur();
+
+      for (const pending of deletes.values()) {
+        pending.next();
+        pending.complete();
+      }
+      await fixture.whenStable();
+
+      // Tools was first (index 0): its neighbour Books gets focus, not the one after Toolshed.
+      expect(document.activeElement).toBe(actionsButton('Books'));
+    });
+
     it('AC-9 keeps the box and clears the deleting state when delete fails', async () => {
       mockBoxesService.delete.mockReturnValue(throwError(() => new Error('API error')));
       await requestDelete('Tools');
@@ -283,7 +402,7 @@ describe('BoxesDashboard', () => {
       await fixture.whenStable();
 
       expect(mockBoxesService.delete).toHaveBeenCalledWith('1');
-      expect(component.deletingId()).toBeNull();
+      expect(component.isDeleting('1')).toBe(false);
       expect(component.boxes().length).toBe(3);
       expect(mockNotificationService.show).not.toHaveBeenCalled();
     });
@@ -296,6 +415,38 @@ describe('BoxesDashboard', () => {
       await fixture.whenStable();
 
       expect(document.activeElement).toBe(trigger);
+    });
+
+    it('AC-10 does not pull focus back when the user already moved it while the sheet closed', async () => {
+      actionsButton('Tools').focus();
+      await openActionsFor('Tools');
+      sheet()!.querySelector<HTMLButtonElement>('button[aria-label="Cerrar"]')!.click();
+      const search = host().querySelector('input')!;
+      search.focus();
+      await fixture.whenStable();
+
+      expect(document.activeElement).toBe(search);
+    });
+
+    it('AC-10 moves focus to the next box when the deleted box disappears', async () => {
+      mockBoxesService.delete.mockReturnValue(of(undefined));
+      actionsButton('Tools').focus();
+      await requestDelete('Tools');
+      confirmButton('Eliminar').click();
+      await fixture.whenStable();
+
+      expect(document.activeElement).toBe(actionsButton('Books'));
+    });
+
+    it('AC-10 moves focus to the search field when the last box is deleted', async () => {
+      mockBoxesService.delete.mockReturnValue(of(undefined));
+      component.boxes.set([mockBoxes[0]]);
+      await fixture.whenStable();
+      await requestDelete('Tools');
+      confirmButton('Eliminar').click();
+      await fixture.whenStable();
+
+      expect(document.activeElement).toBe(host().querySelector('input'));
     });
   });
 });

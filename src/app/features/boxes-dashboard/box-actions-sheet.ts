@@ -1,17 +1,6 @@
-import {
-  afterNextRender,
-  Component,
-  DestroyRef,
-  ElementRef,
-  inject,
-  input,
-  output,
-  OutputEmitterRef,
-  PendingTasks,
-  viewChild,
-} from '@angular/core';
+import { Component, input, output, OutputEmitterRef, viewChild } from '@angular/core';
 import { BoxSummary } from '../../models/box.models';
-import { closeDialog } from '../../shared/dialog/close-dialog';
+import { ModalDialog } from '../../shared/dialog/modal-dialog';
 
 let nextId = 0;
 
@@ -21,14 +10,12 @@ let nextId = 0;
  */
 @Component({
   selector: 'app-box-actions-sheet',
+  imports: [ModalDialog],
   templateUrl: './box-actions-sheet.html',
   host: { class: 'contents' },
 })
 export class BoxActionsSheet {
-  private readonly pendingTasks = inject(PendingTasks);
-  private readonly dialog = viewChild.required<ElementRef<HTMLDialogElement>>('dialog');
-  private closing = false;
-  private destroyed = false;
+  private readonly modal = viewChild.required(ModalDialog);
 
   readonly box = input.required<BoxSummary>();
 
@@ -45,39 +32,17 @@ export class BoxActionsSheet {
     { label: 'Mover items', icon: 'drive_file_move', emitter: this.moveItems },
   ];
 
-  constructor() {
-    inject(DestroyRef).onDestroy(() => (this.destroyed = true));
-    afterNextRender(() => this.dialog().nativeElement.showModal());
-  }
-
   /** Closes the sheet with its animation, then emits `closed`. */
-  close(): Promise<void> {
-    return this.closeThen(() => this.closed.emit());
+  close(): void {
+    this.modal().close(() => this.closed.emit());
   }
 
   protected choose(emitter: OutputEmitterRef<void>): void {
-    this.closeThen(() => emitter.emit());
+    this.modal().close(() => emitter.emit());
   }
 
-  protected onCancelEvent(event: Event): void {
-    event.preventDefault();
-    this.close();
-  }
-
-  /** Clicks on the ::backdrop are dispatched to the <dialog> itself. */
-  protected onDialogClick(event: MouseEvent): void {
-    if (event.target === this.dialog().nativeElement) this.close();
-  }
-
-  private async closeThen(emit: () => void): Promise<void> {
-    if (this.closing) return;
-    this.closing = true;
-    const taskDone = this.pendingTasks.add();
-    try {
-      await closeDialog(this.dialog().nativeElement);
-      if (!this.destroyed) emit();
-    } finally {
-      taskDone();
-    }
+  /** Deletion stacks a confirmation on top, so the sheet stays open, unless it is already closing. */
+  protected requestDelete(): void {
+    if (!this.modal().closing()) this.deleteRequested.emit();
   }
 }
