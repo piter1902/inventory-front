@@ -41,18 +41,19 @@ export class BoxesDashboard implements OnInit {
   get filteredBoxes(): BoxSummary[] {
     const q = this.searchQuery().toLowerCase().trim();
     if (!q) return this.boxes();
-    return this.boxes().filter(b =>
-      b.name?.toLowerCase().includes(q) ||
-      b.identifier?.toLowerCase().includes(q) ||
-      this.zoneName(b.zoneId)?.toLowerCase().includes(q)
+    return this.boxes().filter(
+      (b) =>
+        b.name?.toLowerCase().includes(q) ||
+        b.identifier?.toLowerCase().includes(q) ||
+        this.zoneName(b.zoneId)?.toLowerCase().includes(q),
     );
   }
 
   ngOnInit(): void {
-    this.zonesService.getAll().subscribe(zones => {
-      this.zoneMap.set(new Map(zones.map(z => [z.id, z.name])));
+    this.zonesService.getAll().subscribe((zones) => {
+      this.zoneMap.set(new Map(zones.map((z) => [z.id, z.name])));
     });
-    this.boxesService.getAll().subscribe(data => this.boxes.set(data));
+    this.boxesService.getAll().subscribe((data) => this.boxes.set(data));
   }
 
   zoneName(zoneId: string | undefined): string | undefined {
@@ -95,7 +96,7 @@ export class BoxesDashboard implements OnInit {
     this.deletingId.set(id);
     this.boxesService.delete(id).subscribe({
       next: () => {
-        this.boxes.update(list => list.filter(b => b.id !== id));
+        this.boxes.update((list) => list.filter((b) => b.id !== id));
         this.notificationService.show(`Caja "${name}" eliminada`, 'success');
         this.deletingId.set(null);
       },

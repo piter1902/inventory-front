@@ -10,9 +10,26 @@ import { NotificationService } from '../../services/notification.service';
 
 describe('BoxesDashboard', () => {
   const mockBoxes: BoxSummary[] = [
-    { id: '1', identifier: 'BOX-001', name: 'Tools', qrUrl: '', hasImage: false, items: [{ id: 'i1', name: 'Hammer', description: 'A hammer' }] },
+    {
+      id: '1',
+      identifier: 'BOX-001',
+      name: 'Tools',
+      qrUrl: '',
+      hasImage: false,
+      items: [{ id: 'i1', name: 'Hammer', description: 'A hammer' }],
+    },
     { id: '2', identifier: 'BOX-002', name: 'Books', qrUrl: '', hasImage: false, items: [] },
-    { id: '3', identifier: 'BOX-003', name: 'Toolshed', qrUrl: '', hasImage: false, items: [{ id: 'i2', name: 'Shovel', description: '' }, { id: 'i3', name: 'Rake', description: '' }] },
+    {
+      id: '3',
+      identifier: 'BOX-003',
+      name: 'Toolshed',
+      qrUrl: '',
+      hasImage: false,
+      items: [
+        { id: 'i2', name: 'Shovel', description: '' },
+        { id: 'i3', name: 'Rake', description: '' },
+      ],
+    },
   ];
 
   let fixture: any;
@@ -88,7 +105,7 @@ describe('BoxesDashboard', () => {
     component.searchQuery.set('tools');
     const filtered = component.filteredBoxes;
     expect(filtered.length).toBe(2);
-    expect(filtered.every(b => b.name.toLowerCase().includes('tools'))).toBe(true);
+    expect(filtered.every((b) => b.name.toLowerCase().includes('tools'))).toBe(true);
   });
 
   it('should filter boxes by identifier', () => {
@@ -169,10 +186,12 @@ describe('BoxesDashboard', () => {
     component.deleteBox(event, '1', 'Tools');
 
     expect(event.stopPropagation).toHaveBeenCalled();
-    expect(window.confirm).toHaveBeenCalledWith('¿Eliminar la caja "Tools"? Esta acción no se puede deshacer.');
+    expect(window.confirm).toHaveBeenCalledWith(
+      '¿Eliminar la caja "Tools"? Esta acción no se puede deshacer.',
+    );
     expect(mockBoxesService.delete).toHaveBeenCalledWith('1');
     expect(component.boxes().length).toBe(2);
-    expect(component.boxes().find(b => b.id === '1')).toBeUndefined();
+    expect(component.boxes().find((b) => b.id === '1')).toBeUndefined();
     expect(mockNotificationService.show).toHaveBeenCalledWith('Caja "Tools" eliminada', 'success');
     expect(component.deletingId()).toBeNull();
     expect(component.openMenuId()).toBeNull();

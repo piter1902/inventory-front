@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
@@ -129,10 +129,15 @@
 
 @layer base {
   * {
-    transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease,
+      border-color 200ms ease,
+      box-shadow 200ms ease;
   }
 
-  html, body {
+  html,
+  body {
     font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -141,12 +146,21 @@
     min-height: 100dvh;
   }
 
-  button { cursor: pointer; }
-  input, textarea { font-family: inherit; }
+  button {
+    cursor: pointer;
+  }
+  input,
+  textarea {
+    font-family: inherit;
+  }
 }
 
 .material-symbols-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
   user-select: none;
   vertical-align: middle;
 }
